@@ -25,7 +25,7 @@ console = Console()
 def list_presets() -> None:
     """List built-in FigureLint presets."""
     table = Table(title="FigureLint presets")
-    table.add_column("Name")
+    table.add_column("Name", no_wrap=True)
     table.add_column("Purpose", overflow="fold")
     table.add_column("DPI", justify="right")
     table.add_column("Raster min", justify="right")
@@ -52,6 +52,9 @@ def list_presets() -> None:
         )
 
     console.print(table)
+    console.print(
+        "[dim]Names: " + ", ".join(available_preset_names()) + "[/dim]"
+    )
     console.print(
         "[dim]Convenience presets are not publisher policies. "
         "Future verified journal presets will include official source metadata.[/dim]"
