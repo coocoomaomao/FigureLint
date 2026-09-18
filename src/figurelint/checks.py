@@ -7,18 +7,20 @@ from PIL import Image, UnidentifiedImageError
 from .models import Finding, Severity
 
 SUPPORTED_RASTER_EXTENSIONS = {".png", ".jpg", ".jpeg"}
+SUPPORTED_VECTOR_EXTENSIONS = {".svg"}
+SUPPORTED_EXTENSIONS = SUPPORTED_RASTER_EXTENSIONS | SUPPORTED_VECTOR_EXTENSIONS
 
 
 def collect_figure_files(target: Path) -> list[Path]:
-    """Return supported raster figure files under target."""
+    """Return supported figure files under target."""
     if target.is_file():
-        return [target] if target.suffix.lower() in SUPPORTED_RASTER_EXTENSIONS else []
+        return [target] if target.suffix.lower() in SUPPORTED_EXTENSIONS else []
 
     if target.is_dir():
         return sorted(
             p
             for p in target.rglob("*")
-            if p.is_file() and p.suffix.lower() in SUPPORTED_RASTER_EXTENSIONS
+            if p.is_file() and p.suffix.lower() in SUPPORTED_EXTENSIONS
         )
 
     return []
