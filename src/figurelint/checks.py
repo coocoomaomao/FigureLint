@@ -92,7 +92,9 @@ def check_raster(
                 ),
             )
         )
-    elif min(dpi) < min_dpi:
+    # PNG stores DPI through pixels-per-metre metadata, which can round a
+    # requested 300 DPI to values such as 299.9994 on read-back.
+    elif min(dpi) < min_dpi - 0.5:
         findings.append(
             Finding(
                 path=path,
