@@ -235,8 +235,8 @@ def _font_size_value(properties: dict[str, str]) -> str | None:
 def check_svg(
     path: Path,
     *,
-    min_font_size_pt: float = 7.0,
-    min_stroke_width_pt: float = 0.5,
+    min_font_size_pt: float | None = 7.0,
+    min_stroke_width_pt: float | None = 0.5,
 ) -> list[Finding]:
     """Inspect an SVG using deterministic, locally-resolvable properties.
 
@@ -297,7 +297,7 @@ def check_svg(
 
             if font_size_pt is None:
                 unknown_font_sizes += 1
-            elif font_size_pt < min_font_size_pt:
+            elif min_font_size_pt is not None and font_size_pt < min_font_size_pt:
                 small_font_sizes.append(font_size_pt)
 
         if tag in _GRAPHICS_TAGS:
@@ -308,6 +308,7 @@ def check_svg(
 
                 if (
                     stroke_width_pt is not None
+                    and min_stroke_width_pt is not None
                     and stroke_width_pt < min_stroke_width_pt
                 ):
                     thin_strokes.append(stroke_width_pt)
@@ -343,7 +344,7 @@ def check_svg(
             )
         )
 
-    if small_font_sizes:
+    if small_font_sizes and min_font_size_pt is not None:
         findings.append(
             Finding(
                 path=path,
@@ -357,7 +358,7 @@ def check_svg(
             )
         )
 
-    if thin_strokes:
+    if thin_strokes and min_stroke_width_pt is not None:
         findings.append(
             Finding(
                 path=path,
