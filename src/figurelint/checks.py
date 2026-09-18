@@ -7,7 +7,7 @@ from PIL import Image, UnidentifiedImageError
 from .models import Finding, Severity
 
 SUPPORTED_RASTER_EXTENSIONS = {".png", ".jpg", ".jpeg"}
-SUPPORTED_VECTOR_EXTENSIONS = {".svg"}
+SUPPORTED_VECTOR_EXTENSIONS = {".svg", ".pdf"}
 SUPPORTED_EXTENSIONS = SUPPORTED_RASTER_EXTENSIONS | SUPPORTED_VECTOR_EXTENSIONS
 
 
