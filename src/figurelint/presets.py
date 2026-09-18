@@ -14,7 +14,9 @@ class Thresholds:
     min_dpi: int | None
     min_short_side: int | None
     min_font_size_pt: float | None
+    max_font_size_pt: float | None
     min_stroke_width_pt: float | None
+    max_stroke_width_pt: float | None
     min_pdf_short_side_in: float | None
     max_pdf_long_side_in: float | None
 
@@ -45,7 +47,9 @@ _DEFAULT_THRESHOLDS = Thresholds(
     min_dpi=300,
     min_short_side=600,
     min_font_size_pt=7.0,
+    max_font_size_pt=None,
     min_stroke_width_pt=0.5,
+    max_stroke_width_pt=None,
     min_pdf_short_side_in=1.0,
     max_pdf_long_side_in=20.0,
 )
@@ -65,7 +69,9 @@ PRESETS: dict[str, Preset] = {
             min_dpi=600,
             min_short_side=1200,
             min_font_size_pt=7.0,
+            max_font_size_pt=None,
             min_stroke_width_pt=0.5,
+            max_stroke_width_pt=None,
             min_pdf_short_side_in=1.0,
             max_pdf_long_side_in=20.0,
         ),
@@ -79,7 +85,9 @@ PRESETS: dict[str, Preset] = {
             min_dpi=150,
             min_short_side=960,
             min_font_size_pt=12.0,
+            max_font_size_pt=None,
             min_stroke_width_pt=0.75,
+            max_stroke_width_pt=None,
             min_pdf_short_side_in=1.0,
             max_pdf_long_side_in=40.0,
         ),
@@ -93,7 +101,9 @@ PRESETS: dict[str, Preset] = {
             min_dpi=300,
             min_short_side=900,
             min_font_size_pt=8.0,
+            max_font_size_pt=None,
             min_stroke_width_pt=0.5,
+            max_stroke_width_pt=None,
             min_pdf_short_side_in=1.0,
             max_pdf_long_side_in=20.0,
         ),
@@ -108,7 +118,9 @@ PRESETS: dict[str, Preset] = {
             min_dpi=300,
             min_short_side=None,
             min_font_size_pt=5.0,
+            max_font_size_pt=7.0,
             min_stroke_width_pt=0.25,
+            max_stroke_width_pt=1.0,
             min_pdf_short_side_in=None,
             max_pdf_long_side_in=247.0 / 25.4,
         ),
@@ -118,7 +130,9 @@ PRESETS: dict[str, Preset] = {
         verified_fields=(
             "min_dpi",
             "min_font_size_pt",
+            "max_font_size_pt",
             "min_stroke_width_pt",
+            "max_stroke_width_pt",
             "max_pdf_long_side_in",
         ),
     ),
@@ -157,7 +171,9 @@ def resolve_thresholds(
     min_dpi: int | None = None,
     min_short_side: int | None = None,
     min_font_size_pt: float | None = None,
+    max_font_size_pt: float | None = None,
     min_stroke_width_pt: float | None = None,
+    max_stroke_width_pt: float | None = None,
     min_pdf_short_side_in: float | None = None,
     max_pdf_long_side_in: float | None = None,
 ) -> tuple[Preset, Thresholds]:
@@ -169,7 +185,9 @@ def resolve_thresholds(
         "min_dpi": min_dpi,
         "min_short_side": min_short_side,
         "min_font_size_pt": min_font_size_pt,
+        "max_font_size_pt": max_font_size_pt,
         "min_stroke_width_pt": min_stroke_width_pt,
+        "max_stroke_width_pt": max_stroke_width_pt,
         "min_pdf_short_side_in": min_pdf_short_side_in,
         "max_pdf_long_side_in": max_pdf_long_side_in,
     }
