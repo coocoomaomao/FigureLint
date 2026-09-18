@@ -41,8 +41,8 @@ def _extract_dpi(image: Image.Image) -> tuple[float, float] | None:
 def check_raster(
     path: Path,
     *,
-    min_dpi: int = 300,
-    min_short_side: int = 600,
+    min_dpi: int | None = 300,
+    min_short_side: int | None = 600,
 ) -> list[Finding]:
     """Inspect one raster image and return technical findings."""
     findings: list[Finding] = []
@@ -67,7 +67,7 @@ def check_raster(
             )
         ]
 
-    if min(width, height) < min_short_side:
+    if min_short_side is not None and min(width, height) < min_short_side:
         findings.append(
             Finding(
                 path=path,
@@ -80,7 +80,7 @@ def check_raster(
             )
         )
 
-    if dpi is None:
+    if min_dpi is not None and dpi is None:
         findings.append(
             Finding(
                 path=path,
@@ -94,7 +94,7 @@ def check_raster(
         )
     # PNG stores DPI through pixels-per-metre metadata, which can round a
     # requested 300 DPI to values such as 299.9994 on read-back.
-    elif min(dpi) < min_dpi - 0.5:
+    elif min_dpi is not None and min(dpi) < min_dpi - 0.5:
         findings.append(
             Finding(
                 path=path,
