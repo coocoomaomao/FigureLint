@@ -8,6 +8,7 @@ from rich.table import Table
 
 from .checks import check_raster, collect_figure_files
 from .models import Severity
+from .pdf_checks import check_pdf
 from .svg_checks import check_svg
 
 app = typer.Typer(
@@ -50,6 +51,18 @@ def check(
         min=0.01,
         help="Warn when a resolvable SVG stroke width is below this many points.",
     ),
+    min_pdf_short_side_in: float = typer.Option(
+        1.0,
+        "--min-pdf-short-side-in",
+        min=0.01,
+        help="Warn when a PDF page short side is below this many inches.",
+    ),
+    max_pdf_long_side_in: float = typer.Option(
+        20.0,
+        "--max-pdf-long-side-in",
+        min=0.1,
+        help="Warn when a PDF page long side is above this many inches.",
+    ),
     strict: bool = typer.Option(
         False,
         "--strict",
@@ -60,7 +73,7 @@ def check(
     files = collect_figure_files(target)
 
     if not files:
-        console.print("[yellow]No supported PNG/JPEG/SVG figures found.[/yellow]")
+        console.print("[yellow]No supported PNG/JPEG/SVG/PDF figures found.[/yellow]")
         raise typer.Exit(code=0)
 
     table = Table(title="FigureLint")
@@ -73,11 +86,19 @@ def check(
     warning_count = 0
 
     for path in files:
-        if path.suffix.lower() == ".svg":
+        suffix = path.suffix.lower()
+        if suffix == ".svg":
             findings = check_svg(
                 path,
                 min_font_size_pt=min_font_size_pt,
                 min_stroke_width_pt=min_stroke_width_pt,
+            )
+        elif suffix == ".pdf":
+            findings = check_pdf(
+                path,
+                min_image_dpi=min_dpi,
+                min_page_short_side_in=min_pdf_short_side_in,
+                max_page_long_side_in=max_pdf_long_side_in,
             )
         else:
             findings = check_raster(
