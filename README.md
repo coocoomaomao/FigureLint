@@ -21,6 +21,45 @@ A figure can look fine on screen and still cause trouble during submission or pr
 
 FigureLint turns those checks into a repeatable command.
 
+## See it in action
+
+<table>
+  <tr>
+    <th>Before — easy-to-miss problems</th>
+    <th>After — publication-safer export</th>
+  </tr>
+  <tr>
+    <td><img src="examples/svg/before.svg" alt="Problematic academic SVG example" width="100%"></td>
+    <td><img src="examples/svg/after.svg" alt="Improved academic SVG example" width="100%"></td>
+  </tr>
+</table>
+
+Run FigureLint on the deliberately problematic example:
+
+~~~bash
+figurelint check examples/svg/before.svg
+~~~
+
+Typical findings:
+
+~~~text
+warning  SVG_FONT_SMALL
+Found 5 text element(s) below 7 pt; smallest resolved size is 5.00 pt.
+
+warning  SVG_STROKE_THIN
+Found 3 stroked element(s) below 0.5 pt; thinnest resolved stroke is 0.30 pt.
+~~~
+
+Now check the improved version:
+
+~~~bash
+figurelint check examples/svg/after.svg
+~~~
+
+It passes the current font-size and stroke-width checks with the default thresholds.
+
+> The demo files are intentionally simple and fully editable so you can inspect exactly what FigureLint is measuring.
+
 ## Current checks
 
 ### PNG / JPEG
