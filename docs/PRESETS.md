@@ -17,6 +17,23 @@ These profiles are maintained by FigureLint. They are **not publisher policies**
 
 `journal` is accepted as an alias for `journal-generic`.
 
+## Source-verified publisher presets
+
+### Nature
+
+`nature` is the first source-verified publisher preset.
+
+It currently maps official Nature guidance to the checks FigureLint can deterministically enforce:
+
+- 300 dpi minimum for photographic/raster imagery
+- 5 pt minimum text size
+- 0.25 pt minimum line/stroke width
+- 247 mm page-depth guardrail for PDF long-side checks
+
+It deliberately leaves unsourced FigureLint convenience thresholds disabled.
+
+See [Nature preset provenance and interpretation](NATURE.md).
+
 ## List presets
 
 ~~~bash
@@ -64,7 +81,7 @@ For example, a user reviewing slide graphics can choose a profile that emphasize
 
 These profiles are product defaults, not statements about what a publisher requires.
 
-## Future verified publisher presets
+## Adding more verified publisher presets
 
 A publisher-specific preset should not be added merely because a threshold is common on the internet.
 
@@ -82,4 +99,4 @@ A future verified preset should:
 4. record the source URL in the preset metadata,
 5. remain explicit about rules that FigureLint cannot check deterministically.
 
-This is the mechanism that future Nature, Science, IEEE, or other publisher profiles will use.
+This is the mechanism used by the Nature profile and intended for future Science, IEEE, or other publisher profiles.

@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- source-verified `nature` preset based on official Nature final-submission guidance
+- publisher-preset provenance fields identifying which thresholds are source-backed
+- support for disabling unsourced thresholds in verified publisher profiles
+- Nature preset tests and provenance documentation
 - preset engine with shared raster, SVG, and PDF thresholds
 - `--preset` support for figure checks
 - `figurelint presets` command for profile discovery
@@ -34,7 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Planned
 - PDF font-size and vector stroke checks
 - color accessibility checks
-- source-verified publisher presets
+- additional source-verified publisher presets
 - GitHub Action annotations
 
 ## [0.1.0] - 2026-09-18

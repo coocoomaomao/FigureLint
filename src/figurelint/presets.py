@@ -5,14 +5,18 @@ from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)
 class Thresholds:
-    """Numeric thresholds shared by raster, SVG, and PDF checks."""
+    """Numeric thresholds shared by raster, SVG, and PDF checks.
 
-    min_dpi: int
-    min_short_side: int
-    min_font_size_pt: float
-    min_stroke_width_pt: float
-    min_pdf_short_side_in: float
-    max_pdf_long_side_in: float
+    A value of None disables that threshold. This lets source-verified publisher
+    presets avoid silently inheriting FigureLint-only assumptions.
+    """
+
+    min_dpi: int | None
+    min_short_side: int | None
+    min_font_size_pt: float | None
+    min_stroke_width_pt: float | None
+    min_pdf_short_side_in: float | None
+    max_pdf_long_side_in: float | None
 
 
 @dataclass(frozen=True)
@@ -25,10 +29,16 @@ class Preset:
     source_name: str | None = None
     source_url: str | None = None
     source_verified: bool = False
+    verified_fields: tuple[str, ...] = ()
 
     @property
     def is_publisher_verified(self) -> bool:
-        return bool(self.source_verified and self.source_name and self.source_url)
+        return bool(
+            self.source_verified
+            and self.source_name
+            and self.source_url
+            and self.verified_fields
+        )
 
 
 _DEFAULT_THRESHOLDS = Thresholds(
@@ -86,6 +96,30 @@ PRESETS: dict[str, Preset] = {
             min_stroke_width_pt=0.5,
             min_pdf_short_side_in=1.0,
             max_pdf_long_side_in=20.0,
+        ),
+    ),
+    "nature": Preset(
+        name="nature",
+        description=(
+            "Source-verified subset of Nature final figure guidance that FigureLint "
+            "can check deterministically."
+        ),
+        thresholds=Thresholds(
+            min_dpi=300,
+            min_short_side=None,
+            min_font_size_pt=5.0,
+            min_stroke_width_pt=0.25,
+            min_pdf_short_side_in=None,
+            max_pdf_long_side_in=247.0 / 25.4,
+        ),
+        source_name="Nature — Final submission",
+        source_url="https://www.nature.com/nature/for-authors/final-submission",
+        source_verified=True,
+        verified_fields=(
+            "min_dpi",
+            "min_font_size_pt",
+            "min_stroke_width_pt",
+            "max_pdf_long_side_in",
         ),
     ),
 }
