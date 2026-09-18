@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="FigureLint social preview">
+  <rect width="1280" height="640" fill="#F6F8FB"/>
+  <circle cx="1115" cy="110" r="180" fill="#E1F2F8"/><circle cx="105" cy="590" r="200" fill="#DDF3F4"/>
+  <g transform="translate(105 130)">
+    <path d="M60 200C50 100 95 48 165 44l42-44 30 57c58 15 95 61 96 135 0 90-61 143-145 143-84 0-130-55-128-135z" fill="#111820" stroke="#1F3A5F" stroke-width="10"/>
+    <path d="M85 78l45-36 7 60zM270 87l48-30-18 64z" fill="#FFC8B8"/>
+    <ellipse cx="151" cy="163" rx="34" ry="43" fill="#fff"/><ellipse cx="248" cy="163" rx="34" ry="43" fill="#fff"/>
+    <circle cx="162" cy="170" r="17"/><circle cx="237" cy="170" r="17"/><circle cx="168" cy="162" r="6" fill="#fff"/><circle cx="243" cy="162" r="6" fill="#fff"/>
+    <g transform="translate(235 210)"><circle cx="78" cy="78" r="80" fill="#fff" stroke="#1F3A5F" stroke-width="14"/><circle cx="78" cy="78" r="66" fill="none" stroke="#2CB1A1" stroke-width="18"/><path d="M49 77l20 22 42-49" fill="none" stroke="#2CB1A1" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><path d="M134 135l60 78" stroke="#1F3A5F" stroke-width="30" stroke-linecap="round"/></g>
+  </g>
+  <g transform="translate(530 170)">
+    <text x="0" y="95" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="112" font-weight="800" fill="#1F3A5F">Figure<tspan fill="#2CB1A1">Lint</tspan></text>
+    <text x="4" y="166" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="650" fill="#5D7590">ESLint for academic figures.</text>
+    <text x="4" y="226" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" fill="#61758B">Catch publication-quality problems</text>
+    <text x="4" y="264" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" fill="#61758B">before submission.</text>
+  </g>
+  <text x="1000" y="565" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#1F3A5F">🐾 Better figures.</text>
+  <text x="1000" y="598" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#2CB1A1">Brighter ideas.</text>
+</svg>
