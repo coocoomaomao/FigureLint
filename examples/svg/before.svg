@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520pt" height="300pt" viewBox="0 0 520 300">
+  <rect width="520" height="300" rx="18" fill="#F8FAFC"/>
+  <text x="28" y="38" font-family="Arial, sans-serif" font-size="14pt" font-weight="700" fill="#1F3A5F">Before: hard-to-publish figure</text>
+  <line x1="72" y1="238" x2="475" y2="238" stroke="#1F3A5F" stroke-width="0.3pt"/>
+  <line x1="72" y1="75" x2="72" y2="238" stroke="#1F3A5F" stroke-width="0.3pt"/>
+  <rect x="112" y="172" width="58" height="66" fill="#8DB6DE"/>
+  <rect x="215" y="128" width="58" height="110" fill="#2CB1A1"/>
+  <rect x="318" y="94" width="58" height="144" fill="#F4A261"/>
+  <text x="126" y="257" font-family="Arial, sans-serif" font-size="5pt" fill="#52677D">Group A</text>
+  <text x="229" y="257" font-family="Arial, sans-serif" font-size="5pt" fill="#52677D">Group B</text>
+  <text x="332" y="257" font-family="Arial, sans-serif" font-size="5pt" fill="#52677D">Group C</text>
+  <text x="15" y="162" font-family="Arial, sans-serif" font-size="5pt" fill="#52677D" transform="rotate(-90 15 162)">Response</text>
+  <text x="399" y="108" font-family="Arial, sans-serif" font-size="5pt" fill="#52677D">n = 24</text>
+  <path d="M 104 158 C 158 138, 208 153, 265 110 S 372 77, 434 62" fill="none" stroke="#E45756" stroke-width="0.3pt"/>
+  <circle cx="434" cy="62" r="4" fill="#E45756"/>
+  <text x="28" y="288" font-family="Arial, sans-serif" font-size="7pt" fill="#B24B4B">Tiny labels + hairline strokes are easy to miss on screen.</text>
+</svg>
