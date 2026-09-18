@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- preset engine with shared raster, SVG, and PDF thresholds
+- `--preset` support for figure checks
+- `figurelint presets` command for profile discovery
+- explicit CLI threshold overrides on top of presets
+- built-in convenience profiles: `default`, `high-resolution`, `presentation`, and `journal-generic`
+- provenance fields for future source-verified publisher presets
+- preset tests and documentation
 - PDF file discovery and inspection
 - malformed, encrypted, and empty-PDF detection
 - multi-page and page-size PDF warnings
@@ -27,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Planned
 - PDF font-size and vector stroke checks
 - color accessibility checks
-- journal presets
+- source-verified publisher presets
 - GitHub Action annotations
 
 ## [0.1.0] - 2026-09-18
