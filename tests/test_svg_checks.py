@@ -179,3 +179,57 @@ def test_exact_upper_bounds_do_not_warn(tmp_path: Path) -> None:
     )
 
     assert not any(f.code in {"SVG_FONT_LARGE", "SVG_STROKE_THICK"} for f in findings)
+
+
+def test_panel_label_semantics_are_opt_in(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    _write_svg(
+        path,
+        '<text x="20" y="30" font-size="8pt" font-weight="bold">a</text>'
+        '<text x="200" y="30" font-size="8pt" font-weight="bold">b</text>',
+    )
+
+    findings = check_svg(path, min_font_size_pt=None, max_font_size_pt=7.0)
+
+    assert any(f.code == "SVG_FONT_LARGE" for f in findings)
+    assert not any(f.code.startswith("SVG_PANEL_LABEL_") for f in findings)
+
+
+def test_panel_label_policy_exempts_detected_sequence_from_ordinary_max(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "figure.svg"
+    _write_svg(
+        path,
+        '<text x="20" y="30" font-size="8pt" font-weight="bold">a</text>'
+        '<text x="200" y="30" font-size="8pt" font-weight="bold">b</text>',
+    )
+
+    findings = check_svg(
+        path,
+        min_font_size_pt=5.0,
+        max_font_size_pt=7.0,
+        panel_label_size_pt=8.0,
+        panel_label_require_bold=True,
+        panel_label_require_upright=True,
+    )
+
+    assert not any(f.code == "SVG_FONT_LARGE" for f in findings)
+    assert not any(f.code.startswith("SVG_PANEL_LABEL_") for f in findings)
+
+
+def test_font_policy_reports_unknown_family_without_guessing(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    _write_svg(
+        path,
+        '<text x="20" y="30" font-size="7pt">Axis</text>',
+    )
+
+    findings = check_svg(
+        path,
+        preferred_font_families=("Arial", "Helvetica"),
+        require_consistent_font_family=True,
+    )
+
+    finding = next(f for f in findings if f.code == "SVG_FONT_FAMILY_UNKNOWN")
+    assert finding.severity is Severity.INFO
