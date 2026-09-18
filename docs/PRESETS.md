@@ -26,8 +26,8 @@ These profiles are maintained by FigureLint. They are **not publisher policies**
 It currently maps official Nature guidance to the checks FigureLint can deterministically enforce:
 
 - 300 dpi minimum for photographic/raster imagery
-- 5 pt minimum text size
-- 0.25 pt minimum line/stroke width
+- 5–7 pt ordinary text range
+- 0.25–1 pt line/stroke range
 - 247 mm page-depth guardrail for PDF long-side checks
 
 It deliberately leaves unsourced FigureLint convenience thresholds disabled.
@@ -69,7 +69,9 @@ The same rule applies to:
 - `--min-dpi`
 - `--min-short-side`
 - `--min-font-size-pt`
+- `--max-font-size-pt`
 - `--min-stroke-width-pt`
+- `--max-stroke-width-pt`
 - `--min-pdf-short-side-in`
 - `--max-pdf-long-side-in`
 

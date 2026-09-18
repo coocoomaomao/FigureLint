@@ -23,7 +23,9 @@ def test_default_preset_preserves_legacy_thresholds() -> None:
     assert thresholds.min_dpi == 300
     assert thresholds.min_short_side == 600
     assert thresholds.min_font_size_pt == 7.0
+    assert thresholds.max_font_size_pt is None
     assert thresholds.min_stroke_width_pt == 0.5
+    assert thresholds.max_stroke_width_pt is None
     assert thresholds.min_pdf_short_side_in == 1.0
     assert thresholds.max_pdf_long_side_in == 20.0
 
@@ -33,11 +35,13 @@ def test_explicit_thresholds_override_preset_values() -> None:
         "high-resolution",
         min_dpi=450,
         min_font_size_pt=9.0,
+        max_font_size_pt=11.0,
     )
 
     assert preset.name == "high-resolution"
     assert thresholds.min_dpi == 450
     assert thresholds.min_font_size_pt == 9.0
+    assert thresholds.max_font_size_pt == 11.0
     assert thresholds.min_short_side == 1200
 
 
@@ -66,10 +70,12 @@ def test_convenience_thresholds_are_positive_and_page_range_is_valid() -> None:
             thresholds.min_font_size_pt is not None
             and thresholds.min_font_size_pt > 0
         )
+        assert thresholds.max_font_size_pt is None
         assert (
             thresholds.min_stroke_width_pt is not None
             and thresholds.min_stroke_width_pt > 0
         )
+        assert thresholds.max_stroke_width_pt is None
         assert (
             thresholds.min_pdf_short_side_in is not None
             and thresholds.min_pdf_short_side_in > 0
@@ -80,7 +86,7 @@ def test_convenience_thresholds_are_positive_and_page_range_is_valid() -> None:
         )
 
 
-def test_nature_preset_has_verified_official_source() -> None:
+def test_nature_preset_has_verified_official_source_and_ranges() -> None:
     preset = get_preset("nature")
     thresholds = preset.thresholds
 
@@ -90,18 +96,22 @@ def test_nature_preset_has_verified_official_source() -> None:
     assert set(preset.verified_fields) == {
         "min_dpi",
         "min_font_size_pt",
+        "max_font_size_pt",
         "min_stroke_width_pt",
+        "max_stroke_width_pt",
         "max_pdf_long_side_in",
     }
     assert thresholds.min_dpi == 300
     assert thresholds.min_short_side is None
     assert thresholds.min_font_size_pt == 5.0
+    assert thresholds.max_font_size_pt == 7.0
     assert thresholds.min_stroke_width_pt == 0.25
+    assert thresholds.max_stroke_width_pt == 1.0
     assert thresholds.min_pdf_short_side_in is None
     assert thresholds.max_pdf_long_side_in == pytest.approx(247.0 / 25.4)
 
 
-def test_presets_command_lists_profiles_and_provenance() -> None:
+def test_presets_command_lists_profiles_and_nature_ranges() -> None:
     result = runner.invoke(app, ["presets"])
 
     assert result.exit_code == 0
@@ -110,6 +120,8 @@ def test_presets_command_lists_profiles_and_provenance() -> None:
     assert "presentation" in result.stdout
     assert "journal-generic" in result.stdout
     assert "nature" in result.stdout
+    assert "5–7pt" in result.stdout
+    assert "0.25–1pt" in result.stdout
     assert "not publisher policies" in result.stdout
 
 
@@ -147,7 +159,7 @@ def test_cli_override_wins_over_selected_preset(tmp_path: Path) -> None:
     assert "CLI overrides" in overridden.stdout
 
 
-def test_nature_cli_applies_sourced_font_and_stroke_minima(tmp_path: Path) -> None:
+def test_nature_cli_applies_sourced_minima(tmp_path: Path) -> None:
     path = tmp_path / "figure.svg"
     path.write_text(
         '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
@@ -164,7 +176,69 @@ def test_nature_cli_applies_sourced_font_and_stroke_minima(tmp_path: Path) -> No
     assert "SVG_FONT_SMALL" in result.stdout
     assert "SVG_STROKE_THIN" in result.stdout
     assert "Official source:" in result.stdout
-    assert "nature.com/nature/for-authors/final-submission" in result.stdout
+
+
+def test_nature_cli_applies_sourced_maxima(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300">'
+        '<text x="20" y="30" font-size="8pt">Oversized label</text>'
+        '<path d="M0 0 L20 20" stroke="#000" stroke-width="1.2pt"/>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["check", str(path), "--preset", "nature"])
+
+    assert result.exit_code == 0
+    assert "SVG_FONT_LARGE" in result.stdout
+    assert "SVG_STROKE_THICK" in result.stdout
+
+
+def test_nature_range_boundaries_are_allowed(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300">'
+        '<text x="20" y="30" font-size="7pt">Max allowed text</text>'
+        '<path d="M0 0 L20 20" stroke="#000" stroke-width="1pt"/>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["check", str(path), "--preset", "nature"])
+
+    assert result.exit_code == 0
+    assert "SVG_FONT_LARGE" not in result.stdout
+    assert "SVG_STROKE_THICK" not in result.stdout
+
+
+def test_nature_maximum_can_be_overridden(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300">'
+        '<text x="20" y="30" font-size="8pt">Custom label</text>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "check",
+            str(path),
+            "--preset",
+            "nature",
+            "--max-font-size-pt",
+            "8",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "SVG_FONT_LARGE" not in result.stdout
+    assert "CLI overrides" in result.stdout
 
 
 def test_nature_does_not_apply_unsourced_raster_pixel_minimum(tmp_path: Path) -> None:

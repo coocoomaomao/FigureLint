@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- Nature preset 2.0 upper-bound checks for 5–7 pt ordinary SVG text and 0.25–1 pt SVG strokes
+- generic `SVG_FONT_LARGE` and `SVG_STROKE_THICK` findings
+- CLI overrides: `--max-font-size-pt` and `--max-stroke-width-pt`
 - source-verified `nature` preset based on official Nature final-submission guidance
 - publisher-preset provenance fields identifying which thresholds are source-backed
 - support for disabling unsourced thresholds in verified publisher profiles

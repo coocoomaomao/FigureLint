@@ -236,7 +236,9 @@ def check_svg(
     path: Path,
     *,
     min_font_size_pt: float | None = 7.0,
+    max_font_size_pt: float | None = None,
     min_stroke_width_pt: float | None = 0.5,
+    max_stroke_width_pt: float | None = None,
 ) -> list[Finding]:
     """Inspect an SVG using deterministic, locally-resolvable properties.
 
@@ -273,7 +275,9 @@ def check_svg(
     text_count = 0
     unknown_font_sizes = 0
     small_font_sizes: list[float] = []
+    large_font_sizes: list[float] = []
     thin_strokes: list[float] = []
+    thick_strokes: list[float] = []
 
     def visit(element: ET.Element, inherited: dict[str, str]) -> None:
         nonlocal text_count, unknown_font_sizes
@@ -297,8 +301,11 @@ def check_svg(
 
             if font_size_pt is None:
                 unknown_font_sizes += 1
-            elif min_font_size_pt is not None and font_size_pt < min_font_size_pt:
-                small_font_sizes.append(font_size_pt)
+            else:
+                if min_font_size_pt is not None and font_size_pt < min_font_size_pt:
+                    small_font_sizes.append(font_size_pt)
+                if max_font_size_pt is not None and font_size_pt > max_font_size_pt:
+                    large_font_sizes.append(font_size_pt)
 
         if tag in _GRAPHICS_TAGS:
             stroke = properties.get("stroke", "").strip().lower()
@@ -306,12 +313,17 @@ def check_svg(
                 raw_width = properties.get("stroke-width", "1")
                 stroke_width_pt = _length_to_pt(raw_width, user_unit_to_pt)
 
-                if (
-                    stroke_width_pt is not None
-                    and min_stroke_width_pt is not None
-                    and stroke_width_pt < min_stroke_width_pt
-                ):
-                    thin_strokes.append(stroke_width_pt)
+                if stroke_width_pt is not None:
+                    if (
+                        min_stroke_width_pt is not None
+                        and stroke_width_pt < min_stroke_width_pt
+                    ):
+                        thin_strokes.append(stroke_width_pt)
+                    if (
+                        max_stroke_width_pt is not None
+                        and stroke_width_pt > max_stroke_width_pt
+                    ):
+                        thick_strokes.append(stroke_width_pt)
 
         for child in element:
             visit(child, properties)
@@ -358,6 +370,20 @@ def check_svg(
             )
         )
 
+    if large_font_sizes and max_font_size_pt is not None:
+        findings.append(
+            Finding(
+                path=path,
+                severity=Severity.WARNING,
+                code="SVG_FONT_LARGE",
+                message=(
+                    f"Found {len(large_font_sizes)} text element(s) above "
+                    f"{max_font_size_pt:g} pt; largest resolved size is "
+                    f"{max(large_font_sizes):.2f} pt."
+                ),
+            )
+        )
+
     if thin_strokes and min_stroke_width_pt is not None:
         findings.append(
             Finding(
@@ -368,6 +394,20 @@ def check_svg(
                     f"Found {len(thin_strokes)} stroked element(s) below "
                     f"{min_stroke_width_pt:g} pt; thinnest resolved stroke is "
                     f"{min(thin_strokes):.2f} pt."
+                ),
+            )
+        )
+
+    if thick_strokes and max_stroke_width_pt is not None:
+        findings.append(
+            Finding(
+                path=path,
+                severity=Severity.WARNING,
+                code="SVG_STROKE_THICK",
+                message=(
+                    f"Found {len(thick_strokes)} stroked element(s) above "
+                    f"{max_stroke_width_pt:g} pt; thickest resolved stroke is "
+                    f"{max(thick_strokes):.2f} pt."
                 ),
             )
         )
