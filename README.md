@@ -17,27 +17,42 @@
 
 ## Why
 
-A figure can look fine on screen and still cause trouble during submission or production: low effective resolution, missing DPI metadata, tiny raster dimensions, accidental transparency, or an export format that is hard to edit later.
+A figure can look fine on screen and still cause trouble during submission or production: low effective resolution, missing DPI metadata, tiny raster dimensions, accidental transparency, text converted to outlines, tiny labels, or strokes that become too thin in print.
 
 FigureLint turns those checks into a repeatable command.
 
-## MVP: v0.1
+## Current checks
 
-FigureLint currently checks PNG and JPEG files for:
+### PNG / JPEG
 
 - unreadable/corrupt image files
 - missing or low DPI metadata
 - suspiciously small raster dimensions
 - transparency that may need flattening for some workflows
 - JPEG usage (informational, because it is lossy)
-- folders of figures recursively
-- CI-friendly exit codes with optional strict mode
+
+### SVG
+
+- malformed/unreadable SVG files
+- whether editable `<text>` elements are present
+- suspiciously small resolvable font sizes
+- suspiciously thin resolvable strokes
+- simple CSS resolution for tag, class, id, and `tag.class` selectors
+- inline style and SVG presentation-attribute resolution
+
+See [SVG inspection details and assumptions](docs/SVG_CHECKS.md).
+
+### Workflow
+
+- recursive folder scanning
+- CI-friendly exit codes
+- optional strict mode
+- configurable thresholds
 
 Planned next:
 
-- PDF and SVG inspection
-- font size and embedded-font checks
-- line-width checks
+- PDF inspection
+- embedded-font checks
 - color contrast and color-blind safety
 - Nature / Science / IEEE / Elsevier-style presets
 - GitHub Action annotations
@@ -62,10 +77,10 @@ pytest
 
 ## Usage
 
-Check one image:
+Check one figure:
 
 ~~~bash
-figurelint check path/to/figure.png
+figurelint check path/to/figure.svg
 ~~~
 
 Check a whole folder:
@@ -80,20 +95,26 @@ Use stricter CI behavior so warnings fail the command:
 figurelint check figures/ --strict
 ~~~
 
-Customize thresholds:
+Customize raster thresholds:
 
 ~~~bash
 figurelint check figure.png --min-dpi 300 --min-short-side 600
 ~~~
 
+Customize SVG thresholds:
+
+~~~bash
+figurelint check figure.svg --min-font-size-pt 7 --min-stroke-width-pt 0.5
+~~~
+
 Example output:
 
 ~~~text
-┏━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ File       ┃ Severity ┃ Code        ┃ Message                          ┃
-┡━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ figure.png │ warning  │ DPI_MISSING │ No DPI metadata was found.       │
-└────────────┴──────────┴─────────────┴──────────────────────────────────┘
+┏━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ File       ┃ Severity ┃ Code            ┃ Message                      ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ figure.svg │ warning  │ SVG_FONT_SMALL  │ Found text below 7 pt.       │
+└────────────┴──────────┴─────────────────┴──────────────────────────────┘
 ~~~
 
 ## Exit codes
