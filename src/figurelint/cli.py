@@ -189,7 +189,7 @@ def check(
     table = Table(title="FigureLint")
     table.add_column("File", overflow="fold")
     table.add_column("Severity")
-    table.add_column("Code")
+    table.add_column("Code", min_width=26, no_wrap=True)
     table.add_column("Message", overflow="fold")
 
     error_count = 0
@@ -198,12 +198,30 @@ def check(
     for path in files:
         suffix = path.suffix.lower()
         if suffix == ".svg":
+            svg_policy = active_preset.svg_policy
             findings = check_svg(
                 path,
                 min_font_size_pt=thresholds.min_font_size_pt,
                 max_font_size_pt=thresholds.max_font_size_pt,
                 min_stroke_width_pt=thresholds.min_stroke_width_pt,
                 max_stroke_width_pt=thresholds.max_stroke_width_pt,
+                panel_label_size_pt=(
+                    svg_policy.panel_label_size_pt if svg_policy else None
+                ),
+                panel_label_require_bold=(
+                    svg_policy.panel_label_require_bold if svg_policy else False
+                ),
+                panel_label_require_upright=(
+                    svg_policy.panel_label_require_upright if svg_policy else False
+                ),
+                preferred_font_families=(
+                    svg_policy.preferred_font_families if svg_policy else ()
+                ),
+                require_consistent_font_family=(
+                    svg_policy.require_consistent_font_family
+                    if svg_policy
+                    else False
+                ),
             )
         elif suffix == ".pdf":
             findings = check_pdf(

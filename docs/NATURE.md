@@ -43,9 +43,39 @@ figurelint check figures/ --preset nature
 
 The CLI prints the official source URL whenever a source-verified preset is active.
 
+## Nature 3.0 semantic SVG checks
+
+Nature 3.0 keeps the 2.0 range checks and adds conservative recognition of multi-panel labels plus font-family guidance.
+
+### Panel labels
+
+Nature specifies multi-part panel labels as **8 pt, bold, upright lower-case letters**. FigureLint only treats standalone lowercase letters as panel labels when it sees a contiguous sequence beginning with at least `a` and `b` (for example `a,b` or `a,b,c`). This deliberately avoids assuming that every isolated one-letter annotation is a panel label.
+
+Recognized panel labels are exempt from the ordinary 7 pt maximum and are checked separately:
+
+- wrong size → `SVG_PANEL_LABEL_SIZE`
+- not bold → `SVG_PANEL_LABEL_WEIGHT`
+- italic/oblique → `SVG_PANEL_LABEL_STYLE`
+
+### Font family
+
+Nature asks for one sans-serif typeface throughout the figures and prefers Helvetica or Arial. When font-family declarations can be resolved, FigureLint reports:
+
+- mixed explicit primary families → `SVG_FONT_INCONSISTENT` (warning)
+- explicit families outside the preferred Arial/Helvetica set → `SVG_FONT_NOT_PREFERRED` (informational)
+- text whose font family cannot be resolved → `SVG_FONT_FAMILY_UNKNOWN` (informational)
+
+The preferred-family finding is informational because Nature's final guidance says Helvetica or Arial are preferred, while the broader sans-serif requirement is the more fundamental rule.
+
+### Editable text / outlines
+
+Nature says not to rasterize or convert figure text to outlines. FigureLint already reports `SVG_NO_EDITABLE_TEXT` when an SVG has no editable `<text>` elements.
+
+FigureLint does **not** claim that arbitrary vector paths are definitely outlined letters. Distinguishing outlined text from legitimate line art requires stronger semantic evidence, so this remains a conservative informational check rather than a fabricated pass/fail decision.
+
 ## Nature 2.0 range checks
 
-Nature 2.0 adds upper-bound validation to the existing lower-bound rules.
+Nature 2.0 added upper-bound validation to the existing lower-bound rules.
 
 Examples:
 
@@ -59,15 +89,15 @@ Boundary values are accepted:
 - 5 pt and 7 pt text are within range
 - 0.25 pt and 1 pt strokes are within range
 
-Panel labels are a special case in Nature's guidance: multi-part figure labels are specified as 8 pt bold. FigureLint does **not** yet distinguish semantic panel labels from ordinary figure text, so an 8 pt SVG label will currently be reported by the generic Nature text-range rule. This limitation is documented rather than silently guessed around.
+Nature 3.0 now handles the common panel-label case conservatively. It still will not guess when labels do not form a clear `a,b,c...` sequence.
 
 ## Why some Nature rules are still not automated
 
 Nature's current guidance also includes requirements or recommendations that FigureLint does not yet fully encode as Nature-specific rules, including:
 
 - standard figure widths include approximately 89 mm and 183 mm, with intermediate widths also used
-- Arial or Helvetica are preferred standard fonts
-- text should remain editable and should not be converted to outlines
+- fully proving whether vector paths represent outlined text
+- verifying the physical position of every panel label within each panel
 - fonts should be embedded
 - RGB is recommended for supplied artwork
 - accessible colour choices are requested
