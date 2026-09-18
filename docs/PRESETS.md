@@ -27,6 +27,8 @@ It currently maps official Nature guidance to the checks FigureLint can determin
 
 - 300 dpi minimum for photographic/raster imagery
 - 5–7 pt ordinary text range
+- 8 pt bold upright `a,b,c...` panel-label policy with conservative sequence detection
+- one explicit font family throughout, with Arial/Helvetica preference guidance
 - 0.25–1 pt line/stroke range
 - 247 mm page-depth guardrail for PDF long-side checks
 
