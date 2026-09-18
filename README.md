@@ -74,8 +74,8 @@ It passes the current font-size and stroke-width checks with the default thresho
 
 - malformed/unreadable SVG files
 - whether editable `<text>` elements are present
-- suspiciously small resolvable font sizes
-- suspiciously thin resolvable strokes
+- suspiciously small or large resolvable font sizes
+- suspiciously thin or thick resolvable strokes
 - simple CSS resolution for tag, class, id, and `tag.class` selectors
 - inline style and SVG presentation-attribute resolution
 
@@ -106,7 +106,7 @@ figurelint check figure.pdf --preset nature
 
 Explicit threshold options override the selected preset, so you can start from a profile and change only one value.
 
-Most built-in profiles are FigureLint convenience presets — **not publisher policies**. The `nature` profile is source-verified against Nature's official final-submission guidance and prints its official source when used.
+Most built-in profiles are FigureLint convenience presets — **not publisher policies**. The `nature` profile is source-verified against Nature's official guidance and checks 5–7 pt ordinary SVG text, 0.25–1 pt SVG strokes, 300 dpi raster imagery, and a 247 mm PDF page-depth guardrail.
 
 See [preset engine details](docs/PRESETS.md) and [Nature preset provenance](docs/NATURE.md).
 
@@ -184,7 +184,11 @@ figurelint check figure.png --min-dpi 300 --min-short-side 600
 Customize SVG thresholds:
 
 ~~~bash
-figurelint check figure.svg --min-font-size-pt 7 --min-stroke-width-pt 0.5
+figurelint check figure.svg \
+  --min-font-size-pt 5 \
+  --max-font-size-pt 7 \
+  --min-stroke-width-pt 0.25 \
+  --max-stroke-width-pt 1
 ~~~
 
 Check a PDF figure:
