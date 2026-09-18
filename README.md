@@ -1,12 +1,8 @@
-# FigureLint
+<p align="center">
+  <img src="assets/figurelint-banner.svg" alt="FigureLint — ESLint for academic figures" width="100%">
+</p>
 
-> **ESLint for academic figures.**
-
-**FigureLint** is an open-source linter for academic figures. It helps researchers and students catch common technical quality issues before submission.
-
-🐈 The project uses a friendly black-cat inspection mascot: cute enough to be memorable, but still clean and professional for research tooling.
-
-<p>
+<p align="center">
   <a href="https://github.com/coocoomaomao/FigureLint/actions/workflows/ci.yml">
     <img src="https://github.com/coocoomaomao/FigureLint/actions/workflows/ci.yml/badge.svg" alt="CI">
   </a>
@@ -14,6 +10,10 @@
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
   <img src="https://img.shields.io/badge/status-alpha-orange" alt="Status Alpha">
 </p>
+
+> **ESLint for academic figures.**
+
+**FigureLint** is an open-source linter for academic figures. It helps researchers and students catch common technical quality issues before submission.
 
 ## Why
 
@@ -102,15 +102,20 @@ Example output:
 - `1`: warnings found in strict mode
 - `2`: one or more errors were found
 
+## Brand assets
+
+The official FigureLint visual system uses a **black cat + magnifying glass + check mark** in navy, teal, orange, and soft gray.
+
+- [README banner](assets/figurelint-banner.svg)
+- [Primary logo](assets/figurelint-logo.svg)
+- [Icon / favicon source](assets/figurelint-icon.svg)
+- [Dark-background logo](assets/figurelint-logo-dark.svg)
+- [Social preview artwork](assets/figurelint-social-preview.svg)
+- [Brand guide](docs/BRAND.md)
+
 ## Philosophy
 
 FigureLint should flag **verifiable technical properties**, not pretend that every journal has the same rules. Thresholds are configurable, and future journal presets will be documented with their source guidelines.
-
-## Brand
-
-FigureLint's official visual direction uses a **black cat + magnifying glass + check mark** system in navy, teal, orange, and soft gray.
-
-See the [brand guide](docs/BRAND.md).
 
 ## Contributing
 
