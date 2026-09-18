@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="300" viewBox="0 0 1000 300" role="img" aria-label="FigureLint logo">
+  <rect width="1000" height="300" rx="28" fill="#ffffff"/>
+  <g transform="translate(38 26) scale(.49)">
+    <path d="M115 230C105 130 149 80 216 75l40-46 31 58c54 14 89 60 91 134 0 88-58 141-137 141-80 0-126-54-126-132z" fill="#111820" stroke="#1F3A5F" stroke-width="10"/>
+    <path d="M139 115l44-37 8 61zM319 124l47-31-18 64z" fill="#FFC8B8"/>
+    <ellipse cx="202" cy="203" rx="35" ry="43" fill="#fff"/><ellipse cx="299" cy="203" rx="35" ry="43" fill="#fff"/>
+    <circle cx="213" cy="209" r="17" fill="#111820"/><circle cx="288" cy="209" r="17" fill="#111820"/>
+    <circle cx="219" cy="201" r="6" fill="#fff"/><circle cx="294" cy="201" r="6" fill="#fff"/>
+    <g transform="translate(260 260)"><circle cx="76" cy="76" r="78" fill="#fff" stroke="#1F3A5F" stroke-width="14"/><circle cx="76" cy="76" r="65" fill="none" stroke="#2CB1A1" stroke-width="18"/><path d="M47 75l20 21 40-47" fill="none" stroke="#2CB1A1" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/></g>
+  </g>
+  <text x="310" y="142" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="92" font-weight="800" fill="#1F3A5F">Figure<tspan fill="#2CB1A1">Lint</tspan></text>
+  <text x="316" y="198" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="34" font-weight="650" fill="#61758B">ESLint for academic figures.</text>
+</svg>
