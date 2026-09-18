@@ -115,3 +115,18 @@ def test_malformed_svg_is_error(tmp_path: Path) -> None:
 
     finding = next(f for f in findings if f.code == "SVG_UNREADABLE")
     assert finding.severity is Severity.ERROR
+
+
+def test_percentage_viewport_does_not_guess_unitless_stroke_size(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" '
+        'viewBox="0 0 400 300">'
+        '<path d="M 0 0 L 10 10" stroke="#000" stroke-width="0.1" fill="none"/>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    findings = check_svg(path)
+
+    assert not any(f.code == "SVG_STROKE_THIN" for f in findings)
