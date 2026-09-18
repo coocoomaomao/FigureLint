@@ -101,13 +101,14 @@ FigureLint can apply named threshold profiles across raster, SVG, and PDF checks
 figurelint presets
 figurelint check figure.svg --preset high-resolution
 figurelint check figures/ --preset journal-generic
+figurelint check figure.pdf --preset nature
 ~~~
 
 Explicit threshold options override the selected preset, so you can start from a profile and change only one value.
 
-The current built-in profiles are FigureLint convenience presets — **not publisher policies**. Future verified publisher presets will carry official source metadata.
+Most built-in profiles are FigureLint convenience presets — **not publisher policies**. The `nature` profile is source-verified against Nature's official final-submission guidance and prints its official source when used.
 
-See [preset engine details](docs/PRESETS.md).
+See [preset engine details](docs/PRESETS.md) and [Nature preset provenance](docs/NATURE.md).
 
 ### Workflow
 
@@ -120,7 +121,7 @@ Planned next:
 
 - PDF font-size and vector stroke checks
 - color contrast and color-blind safety
-- source-verified publisher presets
+- additional source-verified publisher presets
 - GitHub Action annotations
 
 ## Install
@@ -159,6 +160,7 @@ Use a preset:
 
 ~~~bash
 figurelint check figures/ --preset high-resolution
+figurelint check figure.pdf --preset nature
 ~~~
 
 List available presets:
