@@ -22,16 +22,29 @@ class Thresholds:
 
 
 @dataclass(frozen=True)
+class SVGPolicy:
+    """Optional semantic/style rules for SVG publisher profiles."""
+
+    panel_label_size_pt: float | None = None
+    panel_label_require_bold: bool = False
+    panel_label_require_upright: bool = False
+    preferred_font_families: tuple[str, ...] = ()
+    require_consistent_font_family: bool = False
+
+
+@dataclass(frozen=True)
 class Preset:
     """A named collection of FigureLint thresholds and provenance metadata."""
 
     name: str
     description: str
     thresholds: Thresholds
+    svg_policy: SVGPolicy | None = None
     source_name: str | None = None
     source_url: str | None = None
     source_verified: bool = False
     verified_fields: tuple[str, ...] = ()
+    verified_rules: tuple[str, ...] = ()
 
     @property
     def is_publisher_verified(self) -> bool:
@@ -124,6 +137,13 @@ PRESETS: dict[str, Preset] = {
             min_pdf_short_side_in=None,
             max_pdf_long_side_in=247.0 / 25.4,
         ),
+        svg_policy=SVGPolicy(
+            panel_label_size_pt=8.0,
+            panel_label_require_bold=True,
+            panel_label_require_upright=True,
+            preferred_font_families=("Arial", "Helvetica"),
+            require_consistent_font_family=True,
+        ),
         source_name="Nature — Final submission",
         source_url="https://www.nature.com/nature/for-authors/final-submission",
         source_verified=True,
@@ -134,6 +154,12 @@ PRESETS: dict[str, Preset] = {
             "min_stroke_width_pt",
             "max_stroke_width_pt",
             "max_pdf_long_side_in",
+        ),
+        verified_rules=(
+            "panel_label_8pt_bold_upright",
+            "single_sans_serif_typeface",
+            "prefer_arial_or_helvetica",
+            "editable_text_not_outlines",
         ),
     ),
 }
