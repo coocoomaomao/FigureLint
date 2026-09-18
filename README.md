@@ -81,6 +81,18 @@ It passes the current font-size and stroke-width checks with the default thresho
 
 See [SVG inspection details and assumptions](docs/SVG_CHECKS.md).
 
+### PDF
+
+- malformed/unreadable and password-protected PDF detection
+- multi-page figure warnings
+- unusually small or large page-size warnings
+- editable-text detection
+- font embedding checks
+- effective DPI checks for embedded raster images
+- raster soft-mask / alpha-channel detection
+
+See [PDF inspection details and assumptions](docs/PDF_CHECKS.md).
+
 ### Workflow
 
 - recursive folder scanning
@@ -90,8 +102,7 @@ See [SVG inspection details and assumptions](docs/SVG_CHECKS.md).
 
 Planned next:
 
-- PDF inspection
-- embedded-font checks
+- PDF font-size and vector stroke checks
 - color contrast and color-blind safety
 - Nature / Science / IEEE / Elsevier-style presets
 - GitHub Action annotations
@@ -145,6 +156,20 @@ Customize SVG thresholds:
 ~~~bash
 figurelint check figure.svg --min-font-size-pt 7 --min-stroke-width-pt 0.5
 ~~~
+
+Check a PDF figure:
+
+~~~bash
+figurelint check figure.pdf
+~~~
+
+Customize PDF page-size guardrails:
+
+~~~bash
+figurelint check figure.pdf --min-pdf-short-side-in 1 --max-pdf-long-side-in 20
+~~~
+
+The existing `--min-dpi` option is also used for embedded raster images inside PDFs.
 
 Example output:
 
