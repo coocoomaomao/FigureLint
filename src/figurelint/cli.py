@@ -33,6 +33,13 @@ def list_presets() -> None:
     table.add_column("SVG stroke", justify="right")
     table.add_column("Provenance")
 
+    def show(value: int | float | None, unit: str = "") -> str:
+        if value is None:
+            return "—"
+        if isinstance(value, float):
+            return f"{value:g}{unit}"
+        return f"{value}{unit}"
+
     for name in available_preset_names():
         preset = get_preset(name)
         thresholds = preset.thresholds
@@ -44,10 +51,10 @@ def list_presets() -> None:
         table.add_row(
             preset.name,
             preset.description,
-            str(thresholds.min_dpi),
-            f"{thresholds.min_short_side}px",
-            f"{thresholds.min_font_size_pt:g}pt",
-            f"{thresholds.min_stroke_width_pt:g}pt",
+            show(thresholds.min_dpi),
+            show(thresholds.min_short_side, "px"),
+            show(thresholds.min_font_size_pt, "pt"),
+            show(thresholds.min_stroke_width_pt, "pt"),
             provenance,
         )
 
@@ -150,6 +157,8 @@ def check(
         else ""
     )
     console.print(f"[dim]Preset: {active_preset.name}{override_suffix}[/dim]")
+    if active_preset.is_publisher_verified and active_preset.source_url:
+        console.print(f"[dim]Official source: {active_preset.source_url}[/dim]")
 
     table = Table(title="FigureLint")
     table.add_column("File", overflow="fold")
