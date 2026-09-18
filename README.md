@@ -93,18 +93,34 @@ See [SVG inspection details and assumptions](docs/SVG_CHECKS.md).
 
 See [PDF inspection details and assumptions](docs/PDF_CHECKS.md).
 
+### Presets
+
+FigureLint can apply named threshold profiles across raster, SVG, and PDF checks.
+
+~~~bash
+figurelint presets
+figurelint check figure.svg --preset high-resolution
+figurelint check figures/ --preset journal-generic
+~~~
+
+Explicit threshold options override the selected preset, so you can start from a profile and change only one value.
+
+The current built-in profiles are FigureLint convenience presets — **not publisher policies**. Future verified publisher presets will carry official source metadata.
+
+See [preset engine details](docs/PRESETS.md).
+
 ### Workflow
 
 - recursive folder scanning
 - CI-friendly exit codes
 - optional strict mode
-- configurable thresholds
+- configurable thresholds and named presets
 
 Planned next:
 
 - PDF font-size and vector stroke checks
 - color contrast and color-blind safety
-- Nature / Science / IEEE / Elsevier-style presets
+- source-verified publisher presets
 - GitHub Action annotations
 
 ## Install
@@ -137,6 +153,18 @@ Check a whole folder:
 
 ~~~bash
 figurelint check figures/
+~~~
+
+Use a preset:
+
+~~~bash
+figurelint check figures/ --preset high-resolution
+~~~
+
+List available presets:
+
+~~~bash
+figurelint presets
 ~~~
 
 Use stricter CI behavior so warnings fail the command:
