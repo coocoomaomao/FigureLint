@@ -189,7 +189,7 @@ def check(
     table = Table(title="FigureLint")
     table.add_column("File", overflow="fold")
     table.add_column("Severity")
-    table.add_column("Code")
+    table.add_column("Code", min_width=26, no_wrap=True)
     table.add_column("Message", overflow="fold")
 
     error_count = 0
