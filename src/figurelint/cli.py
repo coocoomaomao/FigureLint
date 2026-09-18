@@ -48,13 +48,23 @@ def list_presets() -> None:
             if preset.is_publisher_verified
             else "FigureLint convenience preset"
         )
+        font_range = (
+            f"{show(thresholds.min_font_size_pt)}–{show(thresholds.max_font_size_pt)}pt"
+            if thresholds.max_font_size_pt is not None
+            else show(thresholds.min_font_size_pt, "pt")
+        )
+        stroke_range = (
+            f"{show(thresholds.min_stroke_width_pt)}–{show(thresholds.max_stroke_width_pt)}pt"
+            if thresholds.max_stroke_width_pt is not None
+            else show(thresholds.min_stroke_width_pt, "pt")
+        )
         table.add_row(
             preset.name,
             preset.description,
             show(thresholds.min_dpi),
             show(thresholds.min_short_side, "px"),
-            show(thresholds.min_font_size_pt, "pt"),
-            show(thresholds.min_stroke_width_pt, "pt"),
+            font_range,
+            stroke_range,
             provenance,
         )
 
@@ -99,11 +109,23 @@ def check(
         min=0.1,
         help="Override the preset minimum resolvable SVG font size in points.",
     ),
+    max_font_size_pt: Optional[float] = typer.Option(
+        None,
+        "--max-font-size-pt",
+        min=0.1,
+        help="Override the preset maximum resolvable SVG font size in points.",
+    ),
     min_stroke_width_pt: Optional[float] = typer.Option(
         None,
         "--min-stroke-width-pt",
         min=0.01,
         help="Override the preset minimum resolvable SVG stroke width in points.",
+    ),
+    max_stroke_width_pt: Optional[float] = typer.Option(
+        None,
+        "--max-stroke-width-pt",
+        min=0.01,
+        help="Override the preset maximum resolvable SVG stroke width in points.",
     ),
     min_pdf_short_side_in: Optional[float] = typer.Option(
         None,
@@ -130,7 +152,9 @@ def check(
             min_dpi=min_dpi,
             min_short_side=min_short_side,
             min_font_size_pt=min_font_size_pt,
+            max_font_size_pt=max_font_size_pt,
             min_stroke_width_pt=min_stroke_width_pt,
+            max_stroke_width_pt=max_stroke_width_pt,
             min_pdf_short_side_in=min_pdf_short_side_in,
             max_pdf_long_side_in=max_pdf_long_side_in,
         )
@@ -147,7 +171,9 @@ def check(
         min_dpi,
         min_short_side,
         min_font_size_pt,
+        max_font_size_pt,
         min_stroke_width_pt,
+        max_stroke_width_pt,
         min_pdf_short_side_in,
         max_pdf_long_side_in,
     )
@@ -175,7 +201,9 @@ def check(
             findings = check_svg(
                 path,
                 min_font_size_pt=thresholds.min_font_size_pt,
+                max_font_size_pt=thresholds.max_font_size_pt,
                 min_stroke_width_pt=thresholds.min_stroke_width_pt,
+                max_stroke_width_pt=thresholds.max_stroke_width_pt,
             )
         elif suffix == ".pdf":
             findings = check_pdf(
