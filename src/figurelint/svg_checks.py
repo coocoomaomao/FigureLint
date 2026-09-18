@@ -100,7 +100,7 @@ def _root_user_unit_to_pt(root: ET.Element) -> float | None:
         scales.append(height_pt / parts[3])
 
     if not scales:
-        return 0.75
+        return None
     if len(scales) == 1:
         return scales[0]
 
@@ -284,7 +284,7 @@ def check_svg(
 
         properties = _computed_properties(element, inherited, css_rules)
         inline = _parse_declarations(element.get("style"))
-        display = inline.get("display", element.get("display", "")).strip().lower()
+        display = properties.get("display", element.get("display", "")).strip().lower()
         visibility = properties.get("visibility", "").strip().lower()
 
         if display == "none" or visibility in {"hidden", "collapse"}:
