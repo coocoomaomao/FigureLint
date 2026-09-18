@@ -109,6 +109,18 @@ def test_nature_preset_has_verified_official_source_and_ranges() -> None:
     assert thresholds.max_stroke_width_pt == 1.0
     assert thresholds.min_pdf_short_side_in is None
     assert thresholds.max_pdf_long_side_in == pytest.approx(247.0 / 25.4)
+    assert preset.svg_policy is not None
+    assert preset.svg_policy.panel_label_size_pt == 8.0
+    assert preset.svg_policy.panel_label_require_bold
+    assert preset.svg_policy.panel_label_require_upright
+    assert preset.svg_policy.preferred_font_families == ("Arial", "Helvetica")
+    assert preset.svg_policy.require_consistent_font_family
+    assert {
+        "panel_label_8pt_bold_upright",
+        "single_sans_serif_typeface",
+        "prefer_arial_or_helvetica",
+        "editable_text_not_outlines",
+    }.issubset(set(preset.verified_rules))
 
 
 def test_presets_command_lists_profiles_and_nature_ranges() -> None:
@@ -266,3 +278,98 @@ def test_unknown_preset_is_cli_error(tmp_path: Path) -> None:
     assert result.exit_code != 0
     error_output = result.stdout + getattr(result, "stderr", "")
     assert "Unknown preset" in error_output
+
+
+def test_nature_panel_labels_are_exempt_from_ordinary_7pt_max(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300" font-family="Arial">'
+        '<text x="20" y="30" font-size="8pt" font-weight="bold">a</text>'
+        '<text x="210" y="30" font-size="8pt" font-weight="700">b</text>'
+        '<text x="60" y="280" font-size="7pt">Axis label</text>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["check", str(path), "--preset", "nature"])
+
+    assert result.exit_code == 0
+    assert "SVG_FONT_LARGE" not in result.stdout
+    assert "SVG_PANEL_LABEL_SIZE" not in result.stdout
+    assert "SVG_PANEL_LABEL_WEIGHT" not in result.stdout
+    assert "SVG_PANEL_LABEL_STYLE" not in result.stdout
+
+
+def test_nature_panel_label_style_is_checked(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300" font-family="Helvetica">'
+        '<text x="20" y="30" font-size="7pt" font-style="italic">a</text>'
+        '<text x="210" y="30" font-size="8pt" font-weight="bold">b</text>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["check", str(path), "--preset", "nature"])
+
+    assert result.exit_code == 0
+    assert "SVG_PANEL_LABEL_SIZE" in result.stdout
+    assert "SVG_PANEL_LABEL_WEIGHT" in result.stdout
+    assert "SVG_PANEL_LABEL_STYLE" in result.stdout
+    assert "SVG_FONT_LARGE" not in result.stdout
+
+
+def test_single_letter_is_not_assumed_to_be_panel_label(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300" font-family="Arial">'
+        '<text x="20" y="30" font-size="8pt" font-weight="bold">a</text>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["check", str(path), "--preset", "nature"])
+
+    assert result.exit_code == 0
+    assert "SVG_FONT_LARGE" in result.stdout
+    assert "SVG_PANEL_LABEL_SIZE" not in result.stdout
+
+
+def test_nature_flags_explicit_mixed_font_families(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300">'
+        '<text x="20" y="30" font-size="6pt" font-family="Arial">Axis</text>'
+        '<text x="20" y="60" font-size="6pt" font-family="Times New Roman">Legend</text>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["check", str(path), "--preset", "nature"])
+
+    assert result.exit_code == 0
+    assert "SVG_FONT_INCONSISTENT" in result.stdout
+    assert "SVG_FONT_NOT_PREFERRED" in result.stdout
+
+
+def test_nature_accepts_consistent_helvetica_family(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400pt" height="300pt" '
+        'viewBox="0 0 400 300" font-family="Helvetica, Arial, sans-serif">'
+        '<text x="20" y="30" font-size="6pt">Axis</text>'
+        '<text x="20" y="60" font-size="6pt">Legend</text>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["check", str(path), "--preset", "nature"])
+
+    assert result.exit_code == 0
+    assert "SVG_FONT_INCONSISTENT" not in result.stdout
+    assert "SVG_FONT_NOT_PREFERRED" not in result.stdout
+    assert "SVG_FONT_FAMILY_UNKNOWN" not in result.stdout
