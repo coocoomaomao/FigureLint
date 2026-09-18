@@ -8,6 +8,7 @@ from rich.table import Table
 
 from .checks import check_raster, collect_figure_files
 from .models import Severity
+from .svg_checks import check_svg
 
 app = typer.Typer(
     add_completion=False,
@@ -23,19 +24,31 @@ def check(
         ...,
         exists=True,
         readable=True,
-        help="Image file or directory to inspect.",
+        help="Figure file or directory to inspect.",
     ),
     min_dpi: int = typer.Option(
         300,
         "--min-dpi",
         min=1,
-        help="Warn when reported DPI is below this value.",
+        help="Warn when reported raster DPI is below this value.",
     ),
     min_short_side: int = typer.Option(
         600,
         "--min-short-side",
         min=1,
         help="Warn when the shorter raster dimension is below this many pixels.",
+    ),
+    min_font_size_pt: float = typer.Option(
+        7.0,
+        "--min-font-size-pt",
+        min=0.1,
+        help="Warn when a resolvable SVG text size is below this many points.",
+    ),
+    min_stroke_width_pt: float = typer.Option(
+        0.5,
+        "--min-stroke-width-pt",
+        min=0.01,
+        help="Warn when a resolvable SVG stroke width is below this many points.",
     ),
     strict: bool = typer.Option(
         False,
@@ -47,7 +60,7 @@ def check(
     files = collect_figure_files(target)
 
     if not files:
-        console.print("[yellow]No supported PNG/JPEG figures found.[/yellow]")
+        console.print("[yellow]No supported PNG/JPEG/SVG figures found.[/yellow]")
         raise typer.Exit(code=0)
 
     table = Table(title="FigureLint")
@@ -60,11 +73,18 @@ def check(
     warning_count = 0
 
     for path in files:
-        findings = check_raster(
-            path,
-            min_dpi=min_dpi,
-            min_short_side=min_short_side,
-        )
+        if path.suffix.lower() == ".svg":
+            findings = check_svg(
+                path,
+                min_font_size_pt=min_font_size_pt,
+                min_stroke_width_pt=min_stroke_width_pt,
+            )
+        else:
+            findings = check_raster(
+                path,
+                min_dpi=min_dpi,
+                min_short_side=min_short_side,
+            )
 
         if not findings:
             table.add_row(str(path), "pass", "OK", "No findings.")

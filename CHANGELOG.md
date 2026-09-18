@@ -6,10 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- SVG file discovery and inspection
+- malformed SVG detection
+- editable `<text>` detection
+- configurable small-font warnings for resolvable SVG text
+- configurable thin-stroke warnings
+- simple embedded CSS resolution for tag, class, id, and `tag.class` selectors
+- SVG CLI options: `--min-font-size-pt` and `--min-stroke-width-pt`
+- SVG inspection tests and documentation
+
 ### Planned
-- SVG inspection
 - PDF inspection
-- font and stroke checks
+- embedded-font checks
 - color accessibility checks
 - journal presets
 - GitHub Action annotations
