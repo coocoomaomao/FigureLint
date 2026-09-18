@@ -130,3 +130,52 @@ def test_percentage_viewport_does_not_guess_unitless_stroke_size(tmp_path: Path)
     findings = check_svg(path)
 
     assert not any(f.code == "SVG_STROKE_THIN" for f in findings)
+
+
+def test_large_font_is_warning_when_maximum_enabled(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    _write_svg(
+        path,
+        '<text x="20" y="30" font-size="8pt">Large label</text>',
+    )
+
+    findings = check_svg(path, min_font_size_pt=None, max_font_size_pt=7.0)
+
+    assert any(f.code == "SVG_FONT_LARGE" for f in findings)
+
+
+def test_thick_stroke_is_warning_when_maximum_enabled(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    _write_svg(
+        path,
+        '<path d="M 0 0 L 10 10" stroke="#000" stroke-width="1.2pt" '
+        'fill="none"/>',
+    )
+
+    findings = check_svg(
+        path,
+        min_stroke_width_pt=None,
+        max_stroke_width_pt=1.0,
+    )
+
+    assert any(f.code == "SVG_STROKE_THICK" for f in findings)
+
+
+def test_exact_upper_bounds_do_not_warn(tmp_path: Path) -> None:
+    path = tmp_path / "figure.svg"
+    _write_svg(
+        path,
+        '<text x="20" y="30" font-size="7pt">Boundary label</text>'
+        '<path d="M 0 0 L 10 10" stroke="#000" stroke-width="1pt" '
+        'fill="none"/>',
+    )
+
+    findings = check_svg(
+        path,
+        min_font_size_pt=5.0,
+        max_font_size_pt=7.0,
+        min_stroke_width_pt=0.25,
+        max_stroke_width_pt=1.0,
+    )
+
+    assert not any(f.code in {"SVG_FONT_LARGE", "SVG_STROKE_THICK"} for f in findings)
