@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="FigureLint — ESLint for academic figures">
+  <defs>
+    <linearGradient id="teal" x1="0" x2="1"><stop offset="0" stop-color="#2CB1A1"/><stop offset="1" stop-color="#39C6B5"/></linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F6F8FB"/><stop offset="1" stop-color="#EEF7FA"/></linearGradient>
+  </defs>
+  <rect width="1200" height="360" rx="28" fill="url(#bg)"/>
+  <path d="M0 285 C120 230 185 330 300 286 C420 240 510 325 620 292 C760 248 870 322 1200 260 L1200 360 L0 360Z" fill="#DDF3F4"/>
+  <circle cx="1070" cy="70" r="92" fill="#E2F1F8" opacity=".8"/>
+  <g transform="translate(70 43)">
+    <rect x="83" y="147" width="230" height="142" rx="14" fill="#fff" stroke="#1F3A5F" stroke-width="8"/>
+    <rect x="106" y="175" width="76" height="75" rx="7" fill="#DCEAF8"/>
+    <circle cx="144" cy="198" r="10" fill="#5593D0"/>
+    <path d="M115 239l22-24 14 13 17-20 14 31z" fill="#93BCE3"/>
+    <rect x="206" y="224" width="21" height="38" rx="4" fill="#93BCE3"/>
+    <rect x="238" y="205" width="21" height="57" rx="4" fill="#4E87C4"/>
+    <rect x="270" y="183" width="21" height="79" rx="4" fill="#F4A261"/>
+    <g fill="#111820" stroke="#1F3A5F" stroke-width="4">
+      <path d="M96 151 C94 92 118 45 166 39 L192 14 208 52 C233 56 253 70 267 92 L292 55 299 113 C307 135 306 157 298 176 C273 188 117 186 92 171Z"/>
+      <path d="M94 208 C57 211 43 244 58 267 C73 291 101 275 100 252" fill="none" stroke="#111820" stroke-width="22" stroke-linecap="round"/>
+    </g>
+    <path d="M123 65l24-19 3 32zM258 74l26-16-12 34z" fill="#FFC8B8"/>
+    <ellipse cx="158" cy="112" rx="25" ry="31" fill="#fff"/><ellipse cx="229" cy="112" rx="25" ry="31" fill="#fff"/>
+    <circle cx="166" cy="116" r="12" fill="#111820"/><circle cx="221" cy="116" r="12" fill="#111820"/>
+    <circle cx="171" cy="110" r="4" fill="#fff"/><circle cx="226" cy="110" r="4" fill="#fff"/>
+    <path d="M189 139q8-7 16 0q-8 10-16 0z" fill="#F5D6CF"/>
+    <path d="M197 145v7m0 0q-8 8-15 0m15 0q8 8 15 0" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M100 130l-32-5m33 18l-35 3m199-17l34-5m-35 20l34 3" stroke="#111820" stroke-width="5" stroke-linecap="round"/>
+    <g transform="translate(250 123)">
+      <circle cx="55" cy="55" r="57" fill="#fff" stroke="#1F3A5F" stroke-width="10"/>
+      <circle cx="55" cy="55" r="47" fill="none" stroke="url(#teal)" stroke-width="12"/>
+      <path d="M34 55l14 15 30-34" fill="none" stroke="#2CB1A1" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M94 96l39 51" stroke="#1F3A5F" stroke-width="20" stroke-linecap="round"/>
+      <path d="M97 98l37 48" stroke="#214D7B" stroke-width="11" stroke-linecap="round"/>
+    </g>
+    <g stroke="#2CB1A1" stroke-width="9" stroke-linecap="round">
+      <path d="M305 73l7-19"/><path d="M321 80l18-11"/><path d="M326 96l20 1"/>
+    </g>
+  </g>
+  <g transform="translate(465 72)">
+    <text x="0" y="95" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="86" font-weight="800" fill="#1F3A5F">Figure<tspan fill="#2CB1A1">Lint</tspan></text>
+    <text x="4" y="151" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="34" font-weight="650" fill="#5D7590">ESLint for academic figures.</text>
+    <text x="4" y="199" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" fill="#61758B">Catch publication-quality problems before submission.</text>
+    <g transform="translate(5 234)" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" fill="#1F3A5F">
+      <circle cx="10" cy="10" r="10" fill="#2CB1A1"/><path d="M5 10l4 4 7-9" fill="none" stroke="#fff" stroke-width="3"/><text x="30" y="16">Check DPI</text>
+      <circle cx="170" cy="10" r="10" fill="#2CB1A1"/><path d="M165 10l4 4 7-9" fill="none" stroke="#fff" stroke-width="3"/><text x="190" y="16">Detect issues</text>
+      <circle cx="360" cy="10" r="10" fill="#2CB1A1"/><path d="M355 10l4 4 7-9" fill="none" stroke="#fff" stroke-width="3"/><text x="380" y="16">Improve quality</text>
+    </g>
+  </g>
+</svg>
