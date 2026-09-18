@@ -68,9 +68,9 @@ def _image_effective_dpi(
 def check_pdf(
     path: Path,
     *,
-    min_image_dpi: int = 300,
-    min_page_short_side_in: float = 1.0,
-    max_page_long_side_in: float = 20.0,
+    min_image_dpi: int | None = 300,
+    min_page_short_side_in: float | None = 1.0,
+    max_page_long_side_in: float | None = 20.0,
 ) -> list[Finding]:
     """Inspect one PDF figure and return deterministic technical findings."""
     try:
@@ -121,8 +121,16 @@ def check_pdf(
                 )
             )
 
-        min_short_side_pt = min_page_short_side_in * 72.0
-        max_long_side_pt = max_page_long_side_in * 72.0
+        min_short_side_pt = (
+            min_page_short_side_in * 72.0
+            if min_page_short_side_in is not None
+            else None
+        )
+        max_long_side_pt = (
+            max_page_long_side_in * 72.0
+            if max_page_long_side_in is not None
+            else None
+        )
 
         too_small_pages: list[float] = []
         too_large_pages: list[float] = []
@@ -139,9 +147,9 @@ def check_pdf(
             short_side_pt = min(width_pt, height_pt)
             long_side_pt = max(width_pt, height_pt)
 
-            if short_side_pt < min_short_side_pt:
+            if min_short_side_pt is not None and short_side_pt < min_short_side_pt:
                 too_small_pages.append(short_side_pt / 72.0)
-            if long_side_pt > max_long_side_pt:
+            if max_long_side_pt is not None and long_side_pt > max_long_side_pt:
                 too_large_pages.append(long_side_pt / 72.0)
 
             try:
@@ -194,18 +202,19 @@ def check_pdf(
                 if smask > 0:
                     soft_mask_images += 1
 
-                low_dpi_values.extend(
-                    dpi
-                    for dpi in _image_effective_dpi(
-                        page,
-                        xref=xref,
-                        pixel_width=pixel_width,
-                        pixel_height=pixel_height,
+                if min_image_dpi is not None:
+                    low_dpi_values.extend(
+                        dpi
+                        for dpi in _image_effective_dpi(
+                            page,
+                            xref=xref,
+                            pixel_width=pixel_width,
+                            pixel_height=pixel_height,
+                        )
+                        if dpi < min_image_dpi - 0.5
                     )
-                    if dpi < min_image_dpi - 0.5
-                )
 
-        if too_small_pages:
+        if too_small_pages and min_page_short_side_in is not None:
             findings.append(
                 Finding(
                     path=path,
@@ -219,7 +228,7 @@ def check_pdf(
                 )
             )
 
-        if too_large_pages:
+        if too_large_pages and max_page_long_side_in is not None:
             findings.append(
                 Finding(
                     path=path,
@@ -280,7 +289,7 @@ def check_pdf(
                 )
             )
 
-        if low_dpi_values:
+        if low_dpi_values and min_image_dpi is not None:
             findings.append(
                 Finding(
                     path=path,
