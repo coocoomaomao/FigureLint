@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -20,9 +21,27 @@ _FONT_SIZE_RE = re.compile(
     re.IGNORECASE,
 )
 
-_INHERITED_PROPERTIES = {"font-size", "font", "stroke", "stroke-width", "visibility"}
+_INHERITED_PROPERTIES = {
+    "font-size",
+    "font",
+    "font-family",
+    "font-weight",
+    "font-style",
+    "stroke",
+    "stroke-width",
+    "visibility",
+}
 _GRAPHICS_TAGS = {"path", "line", "polyline", "polygon", "rect", "circle", "ellipse"}
 _SKIP_SUBTREES = {"defs", "clipPath", "mask", "marker", "metadata"}
+
+
+@dataclass(frozen=True)
+class _TextRecord:
+    text: str
+    font_size_pt: float | None
+    font_family: str | None
+    font_weight: str | None
+    font_style: str | None
 
 
 def _local_name(tag: str) -> str:
@@ -56,7 +75,7 @@ def _parse_absolute_length_to_pt(value: str | None) -> float | None:
     number = float(match.group(1))
     unit = match.group(2).lower()
     factors = {
-        "": 0.75,  # outer SVG lengths without units are CSS px
+        "": 0.75,
         "px": 0.75,
         "pt": 1.0,
         "pc": 12.0,
@@ -72,12 +91,7 @@ def _parse_absolute_length_to_pt(value: str | None) -> float | None:
 
 
 def _root_user_unit_to_pt(root: ET.Element) -> float | None:
-    """Estimate root SVG user-unit size in points.
-
-    When width/height and viewBox provide a near-uniform mapping, use it.
-    Otherwise fall back to the CSS px mapping when no viewBox mapping is
-    available. Non-uniform mappings are intentionally left unresolved.
-    """
+    """Estimate root SVG user-unit size in points."""
     view_box = root.get("viewBox") or root.get("viewbox")
     if not view_box:
         return 0.75
@@ -192,7 +206,6 @@ def _computed_properties(
         key: value for key, value in inherited.items() if key in _INHERITED_PROPERTIES
     }
 
-    # SVG presentation attributes have low specificity.
     for key in _INHERITED_PROPERTIES:
         value = element.get(key)
         if value is not None:
@@ -211,7 +224,6 @@ def _computed_properties(
     for key, (_, _, value) in matched.items():
         properties[key] = value
 
-    # Inline style wins over stylesheet/presentation attributes.
     properties.update(_parse_declarations(element.get("style")))
     return properties
 
@@ -232,6 +244,110 @@ def _font_size_value(properties: dict[str, str]) -> str | None:
     return f"{match.group(1)}{match.group(2)}"
 
 
+def _font_family_value(properties: dict[str, str]) -> str | None:
+    direct = properties.get("font-family")
+    if direct:
+        return direct.strip()
+
+    shorthand = properties.get("font")
+    if not shorthand:
+        return None
+
+    match = _FONT_SIZE_RE.search(shorthand)
+    if not match:
+        return None
+
+    tail = shorthand[match.end():].strip()
+    if tail.startswith("/"):
+        tail = tail[1:].lstrip()
+        parts = tail.split(None, 1)
+        if len(parts) != 2:
+            return None
+        tail = parts[1].strip()
+
+    return tail or None
+
+
+def _font_weight_value(properties: dict[str, str]) -> str | None:
+    direct = properties.get("font-weight")
+    if direct:
+        return direct.strip().lower()
+
+    shorthand = properties.get("font")
+    if not shorthand:
+        return None
+
+    match = _FONT_SIZE_RE.search(shorthand)
+    prefix = shorthand[: match.start()] if match else shorthand
+    tokens = re.findall(r"\b(?:bold|bolder|[1-9]00)\b", prefix, re.IGNORECASE)
+    return tokens[-1].lower() if tokens else None
+
+
+def _font_style_value(properties: dict[str, str]) -> str | None:
+    direct = properties.get("font-style")
+    if direct:
+        return direct.strip().lower()
+
+    shorthand = properties.get("font")
+    if not shorthand:
+        return None
+
+    match = _FONT_SIZE_RE.search(shorthand)
+    prefix = shorthand[: match.start()] if match else shorthand
+    style = re.search(r"\b(italic|oblique|normal)\b", prefix, re.IGNORECASE)
+    return style.group(1).lower() if style else None
+
+
+def _font_weight_is_bold(value: str | None) -> bool:
+    if value is None:
+        return False
+
+    normalized = value.strip().lower()
+    if normalized in {"bold", "bolder"}:
+        return True
+
+    try:
+        return int(normalized) >= 600
+    except ValueError:
+        return False
+
+
+def _font_style_is_upright(value: str | None) -> bool:
+    return value is None or value.strip().lower() not in {"italic", "oblique"}
+
+
+def _font_families(value: str | None) -> tuple[str, ...]:
+    if not value:
+        return ()
+
+    result: list[str] = []
+    for item in value.split(","):
+        normalized = item.strip().strip("'\"").lower()
+        if normalized:
+            result.append(normalized)
+    return tuple(result)
+
+
+def _panel_label_letters(records: list[_TextRecord]) -> set[str]:
+    """Conservatively detect a contiguous standalone a,b,c... label sequence."""
+    labels = {
+        record.text
+        for record in records
+        if len(record.text) == 1 and "a" <= record.text <= "z"
+    }
+
+    if "a" not in labels or "b" not in labels:
+        return set()
+
+    sequence: set[str] = set()
+    codepoint = ord("a")
+    while chr(codepoint) in labels:
+        sequence.add(chr(codepoint))
+        codepoint += 1
+
+    return sequence if len(sequence) >= 2 else set()
+
+
 def check_svg(
     path: Path,
     *,
@@ -239,12 +355,16 @@ def check_svg(
     max_font_size_pt: float | None = None,
     min_stroke_width_pt: float | None = 0.5,
     max_stroke_width_pt: float | None = None,
+    panel_label_size_pt: float | None = None,
+    panel_label_require_bold: bool = False,
+    panel_label_require_upright: bool = False,
+    preferred_font_families: tuple[str, ...] = (),
+    require_consistent_font_family: bool = False,
 ) -> list[Finding]:
     """Inspect an SVG using deterministic, locally-resolvable properties.
 
-    The checker resolves presentation attributes, inline styles, and simple CSS
-    selectors (tag, class, id, tag.class). Complex selectors, nested transforms,
-    and relative font units are intentionally not guessed.
+    Panel-label and font-family checks are opt-in so publisher presets can use
+    them without changing the default FigureLint behavior.
     """
     try:
         root = ET.parse(path).getroot()
@@ -272,22 +392,16 @@ def check_svg(
     css_rules = _collect_css_rules(root)
     user_unit_to_pt = _root_user_unit_to_pt(root)
 
-    text_count = 0
-    unknown_font_sizes = 0
-    small_font_sizes: list[float] = []
-    large_font_sizes: list[float] = []
+    text_records: list[_TextRecord] = []
     thin_strokes: list[float] = []
     thick_strokes: list[float] = []
 
     def visit(element: ET.Element, inherited: dict[str, str]) -> None:
-        nonlocal text_count, unknown_font_sizes
-
         tag = _local_name(element.tag)
         if tag in _SKIP_SUBTREES:
             return
 
         properties = _computed_properties(element, inherited, css_rules)
-        inline = _parse_declarations(element.get("style"))
         display = properties.get("display", element.get("display", "")).strip().lower()
         visibility = properties.get("visibility", "").strip().lower()
 
@@ -295,17 +409,16 @@ def check_svg(
             return
 
         if tag == "text":
-            text_count += 1
             raw_font_size = _font_size_value(properties)
-            font_size_pt = _length_to_pt(raw_font_size, user_unit_to_pt)
-
-            if font_size_pt is None:
-                unknown_font_sizes += 1
-            else:
-                if min_font_size_pt is not None and font_size_pt < min_font_size_pt:
-                    small_font_sizes.append(font_size_pt)
-                if max_font_size_pt is not None and font_size_pt > max_font_size_pt:
-                    large_font_sizes.append(font_size_pt)
+            text_records.append(
+                _TextRecord(
+                    text="".join(element.itertext()).strip(),
+                    font_size_pt=_length_to_pt(raw_font_size, user_unit_to_pt),
+                    font_family=_font_family_value(properties),
+                    font_weight=_font_weight_value(properties),
+                    font_style=_font_style_value(properties),
+                )
+            )
 
         if tag in _GRAPHICS_TAGS:
             stroke = properties.get("stroke", "").strip().lower()
@@ -330,7 +443,7 @@ def check_svg(
 
     visit(root, {})
 
-    if text_count == 0:
+    if not text_records:
         findings.append(
             Finding(
                 path=path,
@@ -342,47 +455,198 @@ def check_svg(
                 ),
             )
         )
-    elif unknown_font_sizes:
-        findings.append(
-            Finding(
-                path=path,
-                severity=Severity.INFO,
-                code="SVG_FONT_SIZE_UNKNOWN",
-                message=(
-                    f"Could not resolve the font size for {unknown_font_sizes} of "
-                    f"{text_count} text element(s); relative units or complex CSS "
-                    "may be in use."
-                ),
-            )
+    else:
+        panel_letters = (
+            _panel_label_letters(text_records)
+            if panel_label_size_pt is not None
+            else set()
         )
+        unknown_font_sizes = 0
+        small_font_sizes: list[float] = []
+        large_font_sizes: list[float] = []
+        panel_size_issues: list[tuple[str, float]] = []
+        panel_weight_issues: list[str] = []
+        panel_style_issues: list[str] = []
 
-    if small_font_sizes and min_font_size_pt is not None:
-        findings.append(
-            Finding(
-                path=path,
-                severity=Severity.WARNING,
-                code="SVG_FONT_SMALL",
-                message=(
-                    f"Found {len(small_font_sizes)} text element(s) below "
-                    f"{min_font_size_pt:g} pt; smallest resolved size is "
-                    f"{min(small_font_sizes):.2f} pt."
-                ),
-            )
-        )
+        preferred = {family.lower() for family in preferred_font_families}
+        primary_families: set[str] = set()
+        nonpreferred_families: set[str] = set()
+        unknown_font_families = 0
 
-    if large_font_sizes and max_font_size_pt is not None:
-        findings.append(
-            Finding(
-                path=path,
-                severity=Severity.WARNING,
-                code="SVG_FONT_LARGE",
-                message=(
-                    f"Found {len(large_font_sizes)} text element(s) above "
-                    f"{max_font_size_pt:g} pt; largest resolved size is "
-                    f"{max(large_font_sizes):.2f} pt."
-                ),
+        for record in text_records:
+            is_panel_label = record.text in panel_letters
+
+            if record.font_size_pt is None:
+                unknown_font_sizes += 1
+            else:
+                if (
+                    min_font_size_pt is not None
+                    and record.font_size_pt < min_font_size_pt
+                ):
+                    small_font_sizes.append(record.font_size_pt)
+
+                if (
+                    max_font_size_pt is not None
+                    and not is_panel_label
+                    and record.font_size_pt > max_font_size_pt
+                ):
+                    large_font_sizes.append(record.font_size_pt)
+
+                if (
+                    is_panel_label
+                    and panel_label_size_pt is not None
+                    and abs(record.font_size_pt - panel_label_size_pt) > 0.05
+                ):
+                    panel_size_issues.append((record.text, record.font_size_pt))
+
+            if (
+                is_panel_label
+                and panel_label_require_bold
+                and not _font_weight_is_bold(record.font_weight)
+            ):
+                panel_weight_issues.append(record.text)
+
+            if (
+                is_panel_label
+                and panel_label_require_upright
+                and not _font_style_is_upright(record.font_style)
+            ):
+                panel_style_issues.append(record.text)
+
+            if preferred or require_consistent_font_family:
+                families = _font_families(record.font_family)
+                if not families:
+                    unknown_font_families += 1
+                else:
+                    primary_families.add(families[0])
+                    if preferred and not any(family in preferred for family in families):
+                        nonpreferred_families.add(families[0])
+
+        if unknown_font_sizes:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.INFO,
+                    code="SVG_FONT_SIZE_UNKNOWN",
+                    message=(
+                        f"Could not resolve the font size for {unknown_font_sizes} of "
+                        f"{len(text_records)} text element(s); relative units or complex "
+                        "CSS may be in use."
+                    ),
+                )
             )
-        )
+
+        if small_font_sizes and min_font_size_pt is not None:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.WARNING,
+                    code="SVG_FONT_SMALL",
+                    message=(
+                        f"Found {len(small_font_sizes)} text element(s) below "
+                        f"{min_font_size_pt:g} pt; smallest resolved size is "
+                        f"{min(small_font_sizes):.2f} pt."
+                    ),
+                )
+            )
+
+        if large_font_sizes and max_font_size_pt is not None:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.WARNING,
+                    code="SVG_FONT_LARGE",
+                    message=(
+                        f"Found {len(large_font_sizes)} ordinary text element(s) above "
+                        f"{max_font_size_pt:g} pt; largest resolved size is "
+                        f"{max(large_font_sizes):.2f} pt."
+                    ),
+                )
+            )
+
+        if panel_size_issues and panel_label_size_pt is not None:
+            labels = ", ".join(label for label, _ in panel_size_issues)
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.WARNING,
+                    code="SVG_PANEL_LABEL_SIZE",
+                    message=(
+                        f"Detected panel label(s) {labels} outside the configured "
+                        f"{panel_label_size_pt:g} pt panel-label size."
+                    ),
+                )
+            )
+
+        if panel_weight_issues:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.WARNING,
+                    code="SVG_PANEL_LABEL_WEIGHT",
+                    message=(
+                        "Detected panel label(s) that are not bold: "
+                        + ", ".join(panel_weight_issues)
+                        + "."
+                    ),
+                )
+            )
+
+        if panel_style_issues:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.WARNING,
+                    code="SVG_PANEL_LABEL_STYLE",
+                    message=(
+                        "Detected panel label(s) that are italic/oblique instead of "
+                        "upright: "
+                        + ", ".join(panel_style_issues)
+                        + "."
+                    ),
+                )
+            )
+
+        if require_consistent_font_family and len(primary_families) > 1:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.WARNING,
+                    code="SVG_FONT_INCONSISTENT",
+                    message=(
+                        "Multiple explicit primary font families were detected: "
+                        + ", ".join(sorted(primary_families))
+                        + "."
+                    ),
+                )
+            )
+
+        if nonpreferred_families:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.INFO,
+                    code="SVG_FONT_NOT_PREFERRED",
+                    message=(
+                        "Explicit font families outside the preferred set were detected: "
+                        + ", ".join(sorted(nonpreferred_families))
+                        + "."
+                    ),
+                )
+            )
+
+        if (preferred or require_consistent_font_family) and unknown_font_families:
+            findings.append(
+                Finding(
+                    path=path,
+                    severity=Severity.INFO,
+                    code="SVG_FONT_FAMILY_UNKNOWN",
+                    message=(
+                        f"Could not resolve an explicit font family for "
+                        f"{unknown_font_families} of {len(text_records)} text element(s)."
+                    ),
+                )
+            )
 
     if thin_strokes and min_stroke_width_pt is not None:
         findings.append(
