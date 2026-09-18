@@ -106,7 +106,7 @@ figurelint check figure.pdf --preset nature
 
 Explicit threshold options override the selected preset, so you can start from a profile and change only one value.
 
-Most built-in profiles are FigureLint convenience presets — **not publisher policies**. The `nature` profile is source-verified against Nature's official guidance and checks 5–7 pt ordinary SVG text, 0.25–1 pt SVG strokes, 300 dpi raster imagery, and a 247 mm PDF page-depth guardrail.
+Most built-in profiles are FigureLint convenience presets — **not publisher policies**. The `nature` profile is source-verified against Nature's official guidance and checks 5–7 pt ordinary SVG text, 8 pt bold upright panel labels, 0.25–1 pt SVG strokes, font-family consistency/preference, 300 dpi raster imagery, and a 247 mm PDF page-depth guardrail.
 
 See [preset engine details](docs/PRESETS.md) and [Nature preset provenance](docs/NATURE.md).
 
@@ -121,6 +121,7 @@ Planned next:
 
 - PDF font-size and vector stroke checks
 - color contrast and color-blind safety
+- stronger editable-text / outlined-text analysis
 - additional source-verified publisher presets
 - GitHub Action annotations
 
