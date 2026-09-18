@@ -64,7 +64,7 @@ def list_presets() -> None:
     )
     console.print(
         "[dim]Convenience presets are not publisher policies. "
-        "Future verified journal presets will include official source metadata.[/dim]"
+        "Source-verified publisher presets show official source metadata.[/dim]"
     )
 
 
