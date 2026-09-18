@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- PDF file discovery and inspection
+- malformed, encrypted, and empty-PDF detection
+- multi-page and page-size PDF warnings
+- editable-text detection for PDF figures
+- PDF font embedding checks
+- effective DPI checks for embedded PDF raster images
+- PDF raster soft-mask / alpha detection
+- PDF inspection tests and documentation
 - SVG file discovery and inspection
 - malformed SVG detection
 - editable `<text>` detection
@@ -17,8 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - SVG inspection tests and documentation
 
 ### Planned
-- PDF inspection
-- embedded-font checks
+- PDF font-size and vector stroke checks
 - color accessibility checks
 - journal presets
 - GitHub Action annotations
