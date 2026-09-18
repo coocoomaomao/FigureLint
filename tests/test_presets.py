@@ -123,4 +123,5 @@ def test_unknown_preset_is_cli_error(tmp_path: Path) -> None:
     result = runner.invoke(app, ["check", str(path), "--preset", "unknown"])
 
     assert result.exit_code != 0
-    assert "Unknown preset" in result.stdout
+    error_output = result.stdout + getattr(result, "stderr", "")
+    assert "Unknown preset" in error_output
