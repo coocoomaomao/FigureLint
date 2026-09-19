@@ -5,24 +5,35 @@ build-backend = "hatchling.build"
 [project]
 name = "figurelint"
 version = "0.1.0"
-description = "A linter for academic figures."
+description = "Lint academic figures before submission."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
   { name = "coocoomaomao" }
 ]
-keywords = ["academic", "figures", "lint", "research", "publication", "visualization"]
+keywords = [
+  "academic",
+  "figures",
+  "lint",
+  "research",
+  "publication",
+  "visualization",
+  "svg",
+  "pdf",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
   "Pillow>=10.3",
@@ -35,9 +46,19 @@ dependencies = [
 dev = [
   "pytest>=8.2",
 ]
+release = [
+  "build>=1.2",
+  "twine>=5.1",
+]
 
 [project.scripts]
 figurelint = "figurelint.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/coocoomaomao/FigureLint"
+Repository = "https://github.com/coocoomaomao/FigureLint"
+Issues = "https://github.com/coocoomaomao/FigureLint/issues"
+Changelog = "https://github.com/coocoomaomao/FigureLint/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/figurelint"]
