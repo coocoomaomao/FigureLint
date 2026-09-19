@@ -4,7 +4,7 @@ FigureLint can run directly in GitHub Actions and emit native workflow annotatio
 
 ## Basic use
 
-Before the first tagged release, you can test against `main`:
+Pin the action to the current release tag:
 
 ~~~yaml
 name: Figure QA
@@ -19,19 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: coocoomaomao/FigureLint@main
+      - uses: coocoomaomao/FigureLint@v0.1.0
         with:
           path: figures/
           preset: nature
-~~~
-
-After `v0.1.0` is published, pin the action to the release tag:
-
-~~~yaml
-- uses: coocoomaomao/FigureLint@v0.1.0
-  with:
-    path: figures/
-    preset: nature
 ~~~
 
 ## Pull-request annotations

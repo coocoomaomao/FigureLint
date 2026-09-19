@@ -3,12 +3,17 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/figurelint/">
+    <img src="https://img.shields.io/pypi/v/figurelint" alt="PyPI">
+  </a>
+  <a href="https://github.com/coocoomaomao/FigureLint/releases/tag/v0.1.0">
+    <img src="https://img.shields.io/github/v/release/coocoomaomao/FigureLint" alt="GitHub release">
+  </a>
   <a href="https://github.com/coocoomaomao/FigureLint/actions/workflows/ci.yml">
     <img src="https://github.com/coocoomaomao/FigureLint/actions/workflows/ci.yml/badge.svg" alt="CI">
   </a>
-  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
-  <img src="https://img.shields.io/badge/status-alpha-orange" alt="Status Alpha">
+  <img src="https://img.shields.io/pypi/pyversions/figurelint" alt="Python versions">
+  <img src="https://img.shields.io/github/license/coocoomaomao/FigureLint" alt="MIT License">
 </p>
 
 > **ESLint for academic figures.**
@@ -115,14 +120,12 @@ See [preset engine details](docs/PRESETS.md) and [Nature preset provenance](docs
 FigureLint can emit native GitHub workflow annotations and can be used as a reusable composite action.
 
 ~~~yaml
-- uses: coocoomaomao/FigureLint@main
+- uses: coocoomaomao/FigureLint@v0.1.0
   with:
     path: figures/
     preset: nature
     strict: "true"
 ~~~
-
-After the first tagged release, pin to `@v0.1.0` instead of `@main`.
 
 See [GitHub Action usage](docs/GITHUB_ACTION.md).
 
@@ -147,10 +150,17 @@ Requires Python 3.10+.
 
 ### PyPI
 
-The v0.1.0 release is prepared for PyPI Trusted Publishing. Once the first public release is published:
+Install the current public release directly from PyPI:
 
 ~~~bash
 pip install figurelint
+~~~
+
+Then verify the installation:
+
+~~~bash
+figurelint --help
+figurelint presets
 ~~~
 
 ### From source
@@ -273,7 +283,13 @@ FigureLint should flag **verifiable technical properties**, not pretend that eve
 
 ## Release
 
-The first public release is **v0.1.0**. See the [v0.1.0 release notes](docs/releases/v0.1.0.md).
+The first public release is **v0.1.0**.
+
+- [PyPI package](https://pypi.org/project/figurelint/)
+- [GitHub release](https://github.com/coocoomaomao/FigureLint/releases/tag/v0.1.0)
+- [v0.1.0 release notes](docs/releases/v0.1.0.md)
+
+For launch and sharing copy, see the [promotion kit](docs/PROMOTION.md).
 
 ## Contributing
 
