@@ -11,7 +11,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - color accessibility checks
 - stronger editable-text / outlined-text analysis
 - additional source-verified publisher presets
-- GitHub Action annotations
 
 ## [0.1.0] - 2026-09-19
 
@@ -36,6 +35,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - PDF raster soft-mask / alpha detection
 - recursive folder scanning
 - strict mode and CI-friendly exit codes
+- native GitHub Actions workflow annotations
+- reusable composite GitHub Action with preset, strict-mode, and threshold inputs
 - preset engine shared across raster, SVG, and PDF checks
 - built-in convenience presets: `default`, `high-resolution`, `presentation`, and `journal-generic`
 - source-verified `nature` preset with official provenance metadata

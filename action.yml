@@ -1,0 +1,116 @@
+name: "FigureLint"
+description: "Lint academic PNG, JPEG, SVG, and PDF figures in GitHub Actions."
+author: "coocoomaomao"
+
+branding:
+  icon: "check-circle"
+  color: "green"
+
+inputs:
+  path:
+    description: "Figure file or directory to inspect."
+    required: false
+    default: "."
+  preset:
+    description: "FigureLint preset name, for example default or nature."
+    required: false
+    default: "default"
+  strict:
+    description: "Fail the action when warnings are found."
+    required: false
+    default: "false"
+  python-version:
+    description: "Python version used to run FigureLint."
+    required: false
+    default: "3.12"
+  min-dpi:
+    description: "Optional minimum raster/effective PDF image DPI override."
+    required: false
+    default: ""
+  min-short-side:
+    description: "Optional minimum raster short side in pixels."
+    required: false
+    default: ""
+  min-font-size-pt:
+    description: "Optional minimum SVG font size in points."
+    required: false
+    default: ""
+  max-font-size-pt:
+    description: "Optional maximum SVG font size in points."
+    required: false
+    default: ""
+  min-stroke-width-pt:
+    description: "Optional minimum SVG stroke width in points."
+    required: false
+    default: ""
+  max-stroke-width-pt:
+    description: "Optional maximum SVG stroke width in points."
+    required: false
+    default: ""
+  min-pdf-short-side-in:
+    description: "Optional minimum PDF page short side in inches."
+    required: false
+    default: ""
+  max-pdf-long-side-in:
+    description: "Optional maximum PDF page long side in inches."
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install FigureLint
+      shell: bash
+      run: python -m pip install "${{ github.action_path }}"
+
+    - name: Lint academic figures
+      shell: bash
+      env:
+        FIGURELINT_PATH: ${{ inputs.path }}
+        FIGURELINT_PRESET: ${{ inputs.preset }}
+        FIGURELINT_STRICT: ${{ inputs.strict }}
+        FIGURELINT_MIN_DPI: ${{ inputs.min-dpi }}
+        FIGURELINT_MIN_SHORT_SIDE: ${{ inputs.min-short-side }}
+        FIGURELINT_MIN_FONT_SIZE_PT: ${{ inputs.min-font-size-pt }}
+        FIGURELINT_MAX_FONT_SIZE_PT: ${{ inputs.max-font-size-pt }}
+        FIGURELINT_MIN_STROKE_WIDTH_PT: ${{ inputs.min-stroke-width-pt }}
+        FIGURELINT_MAX_STROKE_WIDTH_PT: ${{ inputs.max-stroke-width-pt }}
+        FIGURELINT_MIN_PDF_SHORT_SIDE_IN: ${{ inputs.min-pdf-short-side-in }}
+        FIGURELINT_MAX_PDF_LONG_SIDE_IN: ${{ inputs.max-pdf-long-side-in }}
+      run: |
+        args=(check "$FIGURELINT_PATH" --preset "$FIGURELINT_PRESET" --github-annotations)
+
+        if [[ "$FIGURELINT_STRICT" == "true" ]]; then
+          args+=(--strict)
+        fi
+        if [[ -n "$FIGURELINT_MIN_DPI" ]]; then
+          args+=(--min-dpi "$FIGURELINT_MIN_DPI")
+        fi
+        if [[ -n "$FIGURELINT_MIN_SHORT_SIDE" ]]; then
+          args+=(--min-short-side "$FIGURELINT_MIN_SHORT_SIDE")
+        fi
+        if [[ -n "$FIGURELINT_MIN_FONT_SIZE_PT" ]]; then
+          args+=(--min-font-size-pt "$FIGURELINT_MIN_FONT_SIZE_PT")
+        fi
+        if [[ -n "$FIGURELINT_MAX_FONT_SIZE_PT" ]]; then
+          args+=(--max-font-size-pt "$FIGURELINT_MAX_FONT_SIZE_PT")
+        fi
+        if [[ -n "$FIGURELINT_MIN_STROKE_WIDTH_PT" ]]; then
+          args+=(--min-stroke-width-pt "$FIGURELINT_MIN_STROKE_WIDTH_PT")
+        fi
+        if [[ -n "$FIGURELINT_MAX_STROKE_WIDTH_PT" ]]; then
+          args+=(--max-stroke-width-pt "$FIGURELINT_MAX_STROKE_WIDTH_PT")
+        fi
+        if [[ -n "$FIGURELINT_MIN_PDF_SHORT_SIDE_IN" ]]; then
+          args+=(--min-pdf-short-side-in "$FIGURELINT_MIN_PDF_SHORT_SIDE_IN")
+        fi
+        if [[ -n "$FIGURELINT_MAX_PDF_LONG_SIDE_IN" ]]; then
+          args+=(--max-pdf-long-side-in "$FIGURELINT_MAX_PDF_LONG_SIDE_IN")
+        fi
+
+        figurelint "${args[@]}"

@@ -110,12 +110,29 @@ Most built-in profiles are FigureLint convenience presets — **not publisher po
 
 See [preset engine details](docs/PRESETS.md) and [Nature preset provenance](docs/NATURE.md).
 
+### GitHub Actions
+
+FigureLint can emit native GitHub workflow annotations and can be used as a reusable composite action.
+
+~~~yaml
+- uses: coocoomaomao/FigureLint@main
+  with:
+    path: figures/
+    preset: nature
+    strict: "true"
+~~~
+
+After the first tagged release, pin to `@v0.1.0` instead of `@main`.
+
+See [GitHub Action usage](docs/GITHUB_ACTION.md).
+
 ### Workflow
 
 - recursive folder scanning
 - CI-friendly exit codes
 - optional strict mode
 - configurable thresholds and named presets
+- native GitHub Actions annotations
 
 Planned next:
 
@@ -123,7 +140,6 @@ Planned next:
 - color contrast and color-blind safety
 - stronger editable-text / outlined-text analysis
 - additional source-verified publisher presets
-- GitHub Action annotations
 
 ## Install
 
@@ -186,6 +202,12 @@ Use stricter CI behavior so warnings fail the command:
 
 ~~~bash
 figurelint check figures/ --strict
+~~~
+
+Emit native GitHub Actions annotations:
+
+~~~bash
+figurelint check figures/ --preset nature --github-annotations
 ~~~
 
 Customize raster thresholds:

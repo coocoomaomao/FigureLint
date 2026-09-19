@@ -8,6 +8,7 @@ from rich.console import Console
 from rich.table import Table
 
 from .checks import check_raster, collect_figure_files
+from .github_annotations import format_github_annotation
 from .models import Severity
 from .pdf_checks import check_pdf
 from .presets import available_preset_names, get_preset, resolve_thresholds
@@ -139,6 +140,11 @@ def check(
         min=0.1,
         help="Override the preset maximum PDF page long side in inches.",
     ),
+    github_annotations: bool = typer.Option(
+        False,
+        "--github-annotations",
+        help="Emit GitHub Actions workflow annotations for findings.",
+    ),
     strict: bool = typer.Option(
         False,
         "--strict",
@@ -253,6 +259,8 @@ def check(
                 finding.code,
                 finding.message,
             )
+            if github_annotations:
+                typer.echo(format_github_annotation(finding))
 
     console.print(table)
     console.print(

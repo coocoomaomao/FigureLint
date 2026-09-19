@@ -44,3 +44,16 @@ jobs:
           /tmp/figurelint-wheel/bin/python -m pip install dist/*.whl
           /tmp/figurelint-wheel/bin/figurelint --help
           /tmp/figurelint-wheel/bin/figurelint presets
+
+
+  action-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run FigureLint as a local composite action
+        uses: ./
+        with:
+          path: examples/svg/before.svg
+          preset: default
+          strict: "false"
