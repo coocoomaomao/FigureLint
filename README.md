@@ -129,6 +129,16 @@ Planned next:
 
 Requires Python 3.10+.
 
+### PyPI
+
+The v0.1.0 release is prepared for PyPI Trusted Publishing. Once the first public release is published:
+
+~~~bash
+pip install figurelint
+~~~
+
+### From source
+
 ~~~bash
 git clone https://github.com/coocoomaomao/FigureLint.git
 cd FigureLint
@@ -142,6 +152,8 @@ For development:
 pip install -e ".[dev]"
 pytest
 ~~~
+
+Maintainer release instructions are documented in [docs/PUBLISHING.md](docs/PUBLISHING.md).
 
 ## Usage
 
@@ -236,6 +248,10 @@ The official FigureLint visual system uses a **black cat + magnifying glass + ch
 ## Philosophy
 
 FigureLint should flag **verifiable technical properties**, not pretend that every journal has the same rules. Thresholds are configurable, and future journal presets will be documented with their source guidelines.
+
+## Release
+
+The first public release is **v0.1.0**. See the [v0.1.0 release notes](docs/releases/v0.1.0.md).
 
 ## Contributing
 
